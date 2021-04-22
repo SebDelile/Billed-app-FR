@@ -1,7 +1,7 @@
 import VerticalLayout from './VerticalLayout.js'
 import ErrorPage from "./ErrorPage.js"
 import LoadingPage from "./LoadingPage.js"
-
+import {formatDateReverse} from "../app/format.js"
 import Actions from './Actions.js'
 
 const row = (bill) => {
@@ -20,7 +20,12 @@ const row = (bill) => {
   }
 
 const rows = (data) => {
-  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+  if (data && data.length) {
+    data.sort((a, b) => formatDateReverse(b.date) - formatDateReverse(a.date))
+    return data.map(bill => row(bill)).join("")
+  }  else {
+    return
+  }
 }
 
 export default ({ data: bills, loading, error }) => {
