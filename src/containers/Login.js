@@ -15,7 +15,7 @@ export default class Login {
     const formAdmin = this.document.querySelector(`form[data-testid="form-admin"]`)
     formAdmin.addEventListener("submit", this.handleSubmitAdmin)
   }
-  handleSubmitEmployee = e => {
+  handleSubmitEmployee = async (e) => {
     const user = {
       type: "Employee",
       email: e.target.querySelector(`input[data-testid="employee-email-input"]`).value,
@@ -23,7 +23,7 @@ export default class Login {
       status: "connected"
     }
     this.localStorage.setItem("user", JSON.stringify(user))
-    const userExists = this.checkIfUserExists(user)
+    const userExists = await this.checkIfUserExists(user)
     if (!userExists) this.createUser(user)
     e.preventDefault()
     this.onNavigate(ROUTES_PATH['Bills'])
@@ -50,23 +50,25 @@ export default class Login {
   }
 
   // not need to cover this function by tests
-  checkIfUserExists = (user) => {
-    if (this.firestore) {
-      this.firestore
-      .user(user.email)
-      .get()
-      .then((doc) => {
-        if (doc.exists) {
-          console.log(`User with ${user.email} exists`)
-          return true
-        } else {
-          return false
-        }
-      })
-      .catch(error => error)
-    } else {
-      return null
-    }
+  checkIfUserExists = async (user) => {
+    return new Promise((resolve, reject) => {
+       if (this.firestore) {
+        this.firestore
+        .user(user.email)
+        .get()
+        .then((doc) => {
+          if (doc.exists) { //ici breakpoint jamais atteint dans le débugger
+            console.log(`User with ${user.email} exists`)
+            resolve(true)
+          } else {
+            resolve(false)
+          }
+        })
+        .catch(error => reject(error))
+      } else {
+        reject(null)
+      }
+    })
   }
 
   // not need to cover this function by tests
