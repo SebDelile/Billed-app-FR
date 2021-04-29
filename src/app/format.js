@@ -1,4 +1,5 @@
 export const formatDate = (dateStr) => {
+  if (Date.parse(dateStr) === NaN || dateStr === "") return "1 Jan. 01" //TEMP FIX: there are invalid Dates in the DB and it makes the bill's page to crash
   const date = new Date(dateStr)
   const ye = new Intl.DateTimeFormat('fr', { year: 'numeric' }).format(date)
   const mo = new Intl.DateTimeFormat('fr', { month: 'short' }).format(date)
