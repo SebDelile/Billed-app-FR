@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "test": "jest --coverage --noStackTrace --silent"
+    "test": "jest --coverage --noStackTrace --silent",
+    "jest-debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand"
   },
   "jest": {
     "verbose": false,
