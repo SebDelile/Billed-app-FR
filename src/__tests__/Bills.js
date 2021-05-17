@@ -4,10 +4,8 @@ import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import {formatDate, formatDateReverse} from "../app/format.js"
 import { ROUTES } from "../constants/routes"
-import router from "../app/Router.js"
 import { localStorageMock } from "../__mocks__/localStorage.js"
 import firebase from "../__mocks__/firebase"
-
 
 //setup for tests
 const onNavigateOriginal = (pathname) => {
@@ -19,47 +17,24 @@ class InitiateBills {
     const onNavigate = onNavigateFunction
     Object.defineProperty(window, 'localStorage', { value: localStorageMock })
     window.localStorage.setItem('user', JSON.stringify({
-      type: 'Employee'
+      type: 'Employee',
+      email: "a@a"
     }))
+    const mockFirestore = {
+      bills: function(){
+          return firebase
+      }
+    }
     const html = BillsUI({ data: billsSample, error: error, loading: loading })
     document.body.innerHTML = html
-    new Bills({
-      document, onNavigate, firestore: null, localStorage: window.localStorage
+    this.object = new Bills({
+      document, onNavigate, firestore: mockFirestore, localStorage: window.localStorage
     }) 
   }
 }
 //end of setup
 
 describe("Given I am connected as an employee", () => {
-  describe("When I am on Bills Page", () => {
-    test("Then bill icon in vertical layout should be highlighted", () => {
-      /*
-      let rootNode = document.createElement("div")
-      rootNode.setAttribute("id", "root")
-      document.body.appendChild(rootNode)
-      Object.defineProperty(window, 'location', {
-        value: {
-          pathname: "/",
-          hash: "#employee/bills"
-        }
-      })
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Employee'
-      }))
-      router()
-
-
-      //Calling the router makes a backend call, and noway to reach the code which highligths the icon without calling the router...
-        // TypeError: this.store.collection is not a function
-        // at Firestore.bills (src/app/Firestore.js:13:28)
-        // at _default.getBills (src/containers/Bills.js:35:8)
-        // at _default (src/app/Router.js:85:13)
-        // at Object.<anonymous> (src/__tests__/Bills.js:52:7)
-      */
-    })
-  })
-
   describe("When I am on Bills Page and there are bills", () => {
     test("Then bills date format should be like day as 1 or 2 digits, month as abbreviated month in French, year as two digits", () => {
       const date = formatDate(bills[0].date)
@@ -130,28 +105,51 @@ describe("Given I am connected as an employee", () => {
 describe("Given I am a user connected as Employee", () => {
   describe("When I navigate to Bills page", () => {
     test("fetches bills from mock API GET", async () => {
-       const getSpy = jest.spyOn(firebase, "get")
-       const bills = await firebase.get()
-       expect(getSpy).toHaveBeenCalledTimes(1)
-       expect(bills.data.length).toBe(4)
-    })
+      const getSpy = jest.spyOn(firebase, "get")
+      const initiateBills = new InitiateBills({billsSample: []})
+      const receivedBills = await initiateBills.object.getBills()
+      expect(getSpy).toHaveBeenCalled()
+      expect(receivedBills.length).toEqual(4)
+   })
     test("fetches bills from an API and fails with 404 message error", async () => {
       firebase.get.mockImplementationOnce(() =>
-        Promise.reject(new Error("Erreur 404"))
+        Promise.reject(Error("Erreur 404"))
       )
-      const html = BillsUI({ error: "Erreur 404" })
+      let html
+      try {
+        const response = await firebase.get()
+        html = BillsUI({data: response})
+      }
+      catch(e) {
+        html = BillsUI({ error: e })
+      }
       document.body.innerHTML = html
-      const message = await screen.getByText(/Erreur 404/)
+      const message = screen.getByText(/Erreur 404/)
       expect(message).toBeTruthy()
     })
     test("fetches messages from an API and fails with 500 message error", async () => {
       firebase.get.mockImplementationOnce(() =>
-        Promise.reject(new Error("Erreur 500"))
+        Promise.reject(Error("Erreur 500"))
       )
-      const html = BillsUI({ error: "Erreur 500" })
-      document.body.innerHTML = html
-      const message = await screen.getByText(/Erreur 500/)
+      const initiateBills = new InitiateBills({billsSample: []})
+      const response = await initiateBills.object.getBills()
+      if (response instanceof Error) {
+        new InitiateBills({error: response})
+      }
+      const message = screen.getByText(/Erreur 500/)
       expect(message).toBeTruthy()
     })
+    /*test.only("fetches messages from an API and fails with 500 message error", async () => {
+      firebase.get = jest.fn(() =>
+        {throw Error("Erreur 500")}
+      )
+      const initiateBills = new InitiateBills({billsSample: []})
+      const response = await initiateBills.object.getBills()
+      if (response instanceof Error) {
+        new InitiateBills({error: response})
+      }
+      const message = screen.getByText(/Erreur 500/)
+      expect(message).toBeTruthy()
+    })*/
   })
 })
