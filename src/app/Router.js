@@ -42,7 +42,7 @@ export default () => {
         rootDiv.innerHTML = ROUTES({ pathname, error })
       })
     } else if (pathname === ROUTES_PATH['NewBill']) {
-      rootDiv.innerHTML = ROUTES({ pathname, loading: true })
+      rootDiv.innerHTML = ROUTES({ pathname})
       new NewBill({ document, onNavigate, firestore, localStorage })
       const divIcon1 = document.getElementById('layout-icon1')
       const divIcon2 = document.getElementById('layout-icon2')
@@ -93,7 +93,7 @@ export default () => {
         rootDiv.innerHTML = ROUTES({ pathname: window.location.hash, error })
       })
     } else if (window.location.hash === ROUTES_PATH['NewBill']) {
-      rootDiv.innerHTML = ROUTES({ pathname: window.location.hash, loading: true })
+      rootDiv.innerHTML = ROUTES({ pathname: window.location.hash })
       new NewBill({ document, onNavigate, firestore, localStorage })
       const divIcon1 = document.getElementById('layout-icon1')
       const divIcon2 = document.getElementById('layout-icon2')
