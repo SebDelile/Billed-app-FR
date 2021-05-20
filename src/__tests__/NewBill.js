@@ -52,13 +52,15 @@ class FillTheForm {
     document.querySelector(`input[data-testid="vat"]`).value = vat;
     document.querySelector(`input[data-testid="pct"]`).value = pct;
     document.querySelector(`textarea[data-testid="commentary"]`).value = commentary;
-    const inputFile = document.querySelector(`input[data-testid="file"]`);
-    Object.defineProperty(inputFile, "value", {value: "fakepath/Sample.png"})
-    fireEvent.change(inputFile, {
-      target: {
-        files: [file],
-      },
-    });
+    if (file !== "") {
+      const inputFile = document.querySelector(`input[data-testid="file"]`);
+      Object.defineProperty(inputFile, "value", {value: "fakepath/Sample.png"})
+      fireEvent.change(inputFile, {
+        target: {
+          files: [file],
+        },
+      });
+    }
   }
 }
 
@@ -157,6 +159,61 @@ describe("Given I am connected as an employee", () => {
       userEvent.click(document.getElementById('btn-send-bill'))
       expect(screen.getAllByText("Mes notes de frais")).toBeTruthy()
     });
+  })
+  describe("When I am on NewBill Page and I uncorrectly fill the form and submit (missing value for expense type)", () => {
+    test("Then the form should not be sent and the field expense type should be focussed", () => {
+      const newBill = new InitiateNewBill();
+      new FillTheForm({type: ""})
+      newBill.object.createBill = jest.fn()
+      window.alert = jest.fn() // unknown function in jest environment
+      userEvent.click(document.getElementById('btn-send-bill'))
+      expect(newBill.object.createBill).not.toHaveBeenCalled()
+      expect(document.activeElement).toEqual(document.querySelector(`select[data-testid="expense-type"]`))
+    })
+  })
+  describe("When I am on NewBill Page and I uncorrectly fill the form and submit (missing value for date)", () => {
+    test("Then the form should not be sent and the field date should be focussed", () => {
+      const newBill = new InitiateNewBill();
+      new FillTheForm({date: ""})
+      newBill.object.createBill = jest.fn()
+      window.alert = jest.fn() // unknown function in jest environment
+      userEvent.click(document.getElementById('btn-send-bill'))
+      expect(newBill.object.createBill).not.toHaveBeenCalled()
+      expect(document.activeElement).toEqual(document.querySelector(`input[data-testid="datepicker"]`))
+    })
+  })
+  describe("When I am on NewBill Page and I uncorrectly fill the form and submit (missing value for amount)", () => {
+    test("Then the form should not be sent and the field amount should be focussed", () => {
+      const newBill = new InitiateNewBill();
+      new FillTheForm({amount: ""})
+      newBill.object.createBill = jest.fn()
+      window.alert = jest.fn() // unknown function in jest environment
+      userEvent.click(document.getElementById('btn-send-bill'))
+      expect(newBill.object.createBill).not.toHaveBeenCalled()
+      expect(document.activeElement).toEqual(document.querySelector(`input[data-testid="amount"]`))
+    })
+  })
+  describe("When I am on NewBill Page and I uncorrectly fill the form and submit (missing value for VAT)", () => {
+    test("Then the form should not be sent and the field VAT should be focussed", () => {
+      const newBill = new InitiateNewBill();
+      new FillTheForm({vat: ""})
+      newBill.object.createBill = jest.fn()
+      window.alert = jest.fn() // unknown function in jest environment
+      userEvent.click(document.getElementById('btn-send-bill'))
+      expect(newBill.object.createBill).not.toHaveBeenCalled()
+      expect(document.activeElement).toEqual(document.querySelector(`input[data-testid="vat"]`))
+    })
+  })
+  describe("When I am on NewBill Page and I uncorrectly fill the form and submit (missing file)", () => {
+    test("Then the form should not be sent and the field file should be focussed", () => {
+      const newBill = new InitiateNewBill();
+      new FillTheForm({file: ""})
+      newBill.object.createBill = jest.fn()
+      window.alert = jest.fn() // unknown function in jest environment
+      userEvent.click(document.getElementById('btn-send-bill'))
+      expect(newBill.object.createBill).not.toHaveBeenCalled()
+      expect(document.activeElement).toEqual(document.querySelector(`input[data-testid="file"]`))
+    })
   })
   describe("When I am on NewBill Page and I fill the form whithout pct and submit", () => {
     test("Then the form should be sent with 20 as default value for pct field", () => {
