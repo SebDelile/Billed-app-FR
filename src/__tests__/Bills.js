@@ -5,7 +5,8 @@ import { bills } from "../fixtures/bills.js"
 import {formatDate, formatDateReverse} from "../app/format.js"
 import { ROUTES } from "../constants/routes"
 import { localStorageMock } from "../__mocks__/localStorage.js"
-import firebase from "../__mocks__/firebase"
+import firebaseMock from "../__mocks__/firebase"
+import firestoreMock from "../__mocks__/firestore.js"
 
 //setup for tests
 const onNavigateOriginal = (pathname) => {
@@ -20,15 +21,10 @@ class InitiateBills {
       type: 'Employee',
       email: "a@a"
     }))
-    const mockFirestore = {
-      bills: function(){
-          return firebase
-      }
-    }
     const html = BillsUI({ data: billsSample, error: error, loading: loading })
     document.body.innerHTML = html
     this.object = new Bills({
-      document, onNavigate, firestore: mockFirestore, localStorage: window.localStorage
+      document, onNavigate, firestore: firestoreMock, localStorage: window.localStorage
     }) 
   }
 }
@@ -105,19 +101,19 @@ describe("Given I am connected as an employee", () => {
 describe("Given I am a user connected as Employee", () => {
   describe("When I navigate to Bills page", () => {
     test("fetches bills from mock API GET", async () => {
-      const getSpy = jest.spyOn(firebase, "get")
+      const getSpy = jest.spyOn(firebaseMock, "get")
       const initiateBills = new InitiateBills({billsSample: []})
       const receivedBills = await initiateBills.object.getBills()
       expect(getSpy).toHaveBeenCalled()
       expect(receivedBills.length).toEqual(4)
    })
     test("fetches bills from an API and fails with 404 message error", async () => {
-      firebase.get.mockImplementationOnce(() =>
+      firebaseMock.get.mockImplementationOnce(() =>
         Promise.reject(Error("Erreur 404"))
       )
       let html
       try {
-        const response = await firebase.get()
+        const response = await firebaseMock.get()
         html = BillsUI({data: response})
       }
       catch(e) {
@@ -128,7 +124,7 @@ describe("Given I am a user connected as Employee", () => {
       expect(message).toBeTruthy()
     })
     test("fetches messages from an API and fails with 500 message error", async () => {
-      firebase.get.mockImplementationOnce(() =>
+      firebaseMock.get.mockImplementationOnce(() =>
         Promise.reject(Error("Erreur 500"))
       )
       const initiateBills = new InitiateBills({billsSample: []})

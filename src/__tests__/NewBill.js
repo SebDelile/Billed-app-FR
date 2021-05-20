@@ -4,6 +4,7 @@ import NewBillUI from "../views/NewBillUI.js";
 import NewBill from "../containers/NewBill.js";
 import { ROUTES } from "../constants/routes";
 import { localStorageMock } from "../__mocks__/localStorage.js";
+import firestoreMock from "../__mocks__/firestore.js"
 
 //setup for tests
 const onNavigateOriginal = (pathname) => {
@@ -14,15 +15,6 @@ const onNavigateOriginal = (pathname) => {
 class InitiateNewBill {
   constructor(onNavigateFunction = onNavigateOriginal) {
     const onNavigate = onNavigateFunction;
-    const mockFirestore = {
-      storage: {
-        ref: function(){
-          this.isCalled = true // to spy the call of the firestore
-          return mockFirestore.storage
-        },
-        put: async () => Promise.resolve({ref: {getDownloadURL: () => "fakepath.from.firebase"}})
-      }
-    }
     Object.defineProperty(window, "localStorage", { value: localStorageMock });
     window.localStorage.setItem(
       "user",
@@ -36,7 +28,7 @@ class InitiateNewBill {
     this.object = new NewBill({
       document,
       onNavigate,
-      firestore: mockFirestore,
+      firestore: firestoreMock,
       localStorage: window.localStorage,
     });
   }
