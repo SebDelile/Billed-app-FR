@@ -36,7 +36,16 @@ export default class NewBill {
     }
   }
   handleSubmit = e => {
-    e.preventDefault()
+    e.preventDefault()  
+    // Force the user to actually fill the requiered fields in case "requiered" attribute is disabled.
+    const requieredFields = [`select[data-testid="expense-type"]`, `input[data-testid="datepicker"]`, `input[data-testid="amount"]`, `input[data-testid="vat"]`, `input[data-testid="file"]`]
+    for (let requieredField of e.target.querySelectorAll(requieredFields)) {
+      if (requieredField.value === "") {
+        alert("Veuillez compléter le champ indiqué s'il vous plait")
+        requieredField.focus()
+        return
+      }
+    }
     const email = JSON.parse(localStorage.getItem("user")).email
     const bill = {
       email,
