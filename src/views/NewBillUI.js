@@ -1,8 +1,13 @@
-import VerticalLayout from './VerticalLayout.js'
+/** @module views/NewBillUI */
+import VerticalLayout from "./VerticalLayout.js";
 
+/**
+ * function NewBillUI - build UI of the NewBill page
+ * @function
+ * @return {string} the UI of the NewBill page to be used in the html
+ */
 export default () => {
-
-  return (`
+  return `
     <div class='layout'>
       ${VerticalLayout(120)}
       <div class='content'>
@@ -71,5 +76,5 @@ export default () => {
         </div>
       </div>
     </div>
-  `)
-}
+  `;
+};

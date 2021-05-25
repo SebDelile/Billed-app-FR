@@ -1,6 +1,10 @@
-
+/** @module views/LoginUI */
+/**
+ * function LoginUI - build UI of the Login page
+ * @function
+ * @return {string} the UI of the Login page to be used in the html
+ */
 export default () => {
-
   return(`
       <div class="page-div">
         <div class="row">

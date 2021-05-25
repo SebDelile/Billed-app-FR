@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: views/BillsUI.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: views/BillsUI.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module views/BillsUI */
+import VerticalLayout from "./VerticalLayout.js";
+import ErrorPage from "./ErrorPage.js";
+import LoadingPage from "./LoadingPage.js";
+import { formatDate, formatStatus, formatDateReverse } from "../app/format.js";
+import Actions from "./Actions.js";
+
+/**
+ * function row - build the UI of a row of the Bills table
+ * @function row
+ * @param {Object} bill - a bill object
+ * @return {string} the UI of the table row to be used in the bill's table
+ */
+const row = (bill) => {
+  return `
+    &lt;tr>
+      &lt;td>${bill.type}&lt;/td>
+      &lt;td>${bill.name}&lt;/td>
+      &lt;td>${formatDate(bill.date)}&lt;/td>
+      &lt;td>${bill.amount} €&lt;/td>
+      &lt;td>${formatStatus(bill.status)}&lt;/td>
+      &lt;td>
+        ${Actions(bill.fileUrl)}
+      &lt;/td>
+    &lt;/tr>
+    `;
+};
+
+/**
+ * function rows - build the UI of a row of the Bills table
+ * @function rows
+ * @param {Array} data - the list of the bills
+ * @return {string} the UI of the bill's table to be used in the html
+ */
+const rows = (data) => {
+  if (data &amp;&amp; data.length) {
+    data.sort((a, b) => new Date(b.date) - new Date(a.date));
+    return data.map((bill) => row(bill)).join("");
+  } else {
+    return;
+  }
+};
+
+/**
+ * function BillsUI - build UI of the Bills page
+ * @function
+ * @param {Array} data - the list of the bills
+ * @param {boolean} loading - is loading page or not
+ * @param {string} error - the error message if applicable
+ * @return {string} the UI of the bill's page to be used in the html
+ */
+export default ({ data: bills, loading, error }) => {
+  /**
+   * function modal - build UI of the modal to display the bill's attached file
+   * @function modal
+   * @memberof BillsUI
+   * @return {string} the UI of the modal to be used in the html
+   */
+  const modal = () => `
+    &lt;div class="modal fade" id="modaleFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      &lt;div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        &lt;div class="modal-content">
+          &lt;div class="modal-header">
+            &lt;h5 class="modal-title" id="exampleModalLongTitle">Justificatif&lt;/h5>
+            &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              &lt;span aria-hidden="true">&amp;times;&lt;/span>
+            &lt;/button>
+          &lt;/div>
+          &lt;div class="modal-body">
+          &lt;/div>
+        &lt;/div>
+      &lt;/div>
+    &lt;/div>
+  `;
+
+  if (loading) {
+    return LoadingPage();
+  } else if (error) {
+    return ErrorPage(error);
+  }
+
+  return `
+    &lt;div class='layout'>
+      ${VerticalLayout(120)}
+      &lt;div class='content'>
+        &lt;div class='content-header'>
+          &lt;div class='content-title'> Mes notes de frais &lt;/div>
+          &lt;button type="button" data-testid='btn-new-bill' class="btn btn-primary">Nouvelle note de frais&lt;/button>
+        &lt;/div>
+        &lt;div id="data-table">
+        &lt;table id="example" class="table table-striped" style="width:100%">
+          &lt;thead>
+              &lt;tr>
+                &lt;th>Type&lt;/th>
+                &lt;th>Nom&lt;/th>
+                &lt;th>Date&lt;/th>
+                &lt;th>Montant&lt;/th>
+                &lt;th>Statut&lt;/th>
+                &lt;th>Actions&lt;/th>
+              &lt;/tr>
+          &lt;/thead>
+          &lt;tbody data-testid="tbody">
+            ${rows(bills)}
+          &lt;/tbody>
+          &lt;/table>
+        &lt;/div>
+      &lt;/div>
+      ${modal()}
+    &lt;/div>`;
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-app_format.html">app/format</a></li><li><a href="module-app_Router.html">app/Router</a></li><li><a href="module-constants_routes.html">constants/routes</a></li><li><a href="module-constants_usersTest.html">constants/usersTest</a></li><li><a href="module-fixtures_bills.html">fixtures/bills</a></li><li><a href="module-views_Actions.html">views/Actions</a></li><li><a href="module-views_BillsUI.html">views/BillsUI</a></li><li><a href="module-views_DashboardFormUI.html">views/DashboardFormUI</a></li><li><a href="module-views_DashboardUI.html">views/DashboardUI</a></li><li><a href="module-views_ErrorPage.html">views/ErrorPage</a></li><li><a href="module-views_LoadingPage.html">views/LoadingPage</a></li><li><a href="module-views_LoginUI.html">views/LoginUI</a></li><li><a href="module-views_NewBillUI.html">views/NewBillUI</a></li><li><a href="module-views_VerticalLayout.html">views/VerticalLayout</a></li></ul><h3>Classes</h3><ul><li><a href="Bills.html">Bills</a></li><li><a href="Dashboard.html">Dashboard</a></li><li><a href="Firestore.html">Firestore</a></li><li><a href="Login.html">Login</a></li><li><a href="Logout.html">Logout</a></li><li><a href="NewBill.html">NewBill</a></li></ul><h3>Global</h3><ul><li><a href="global.html#card">card</a></li><li><a href="global.html#cards">cards</a></li><li><a href="global.html#filteredBills">filteredBills</a></li><li><a href="global.html#getStatus">getStatus</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue May 25 2021 11:20:18 GMT+0200 (heure d’été d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

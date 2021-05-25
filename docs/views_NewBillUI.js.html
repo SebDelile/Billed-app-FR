@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: views/NewBillUI.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: views/NewBillUI.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module views/NewBillUI */
+import VerticalLayout from "./VerticalLayout.js";
+
+/**
+ * function NewBillUI - build UI of the NewBill page
+ * @function
+ * @return {string} the UI of the NewBill page to be used in the html
+ */
+export default () => {
+  return `
+    &lt;div class='layout'>
+      ${VerticalLayout(120)}
+      &lt;div class='content'>
+        &lt;div class='content-header'>
+          &lt;div class='content-title'> Envoyer une note de frais &lt;/div>
+        &lt;/div>
+        &lt;div class="form-newbill-container content-inner">
+          &lt;form data-testid="form-new-bill">
+            &lt;div class="row">
+                &lt;div class="col-md-6">
+                  &lt;div class="col-half">
+                    &lt;label for="expense-type" class="bold-label">Type de dépense&lt;/label>
+                      &lt;select required class="form-control blue-border" data-testid="expense-type">
+                        &lt;option value="">-- Choisissez une option --&lt;/option>  
+                        &lt;option>Transports&lt;/option>
+                        &lt;option>Restaurants et bars&lt;/option>
+                        &lt;option>Hôtel et logement&lt;/option>
+                        &lt;option>Services en ligne&lt;/option>
+                        &lt;option>IT et électronique&lt;/option>
+                        &lt;option>Equipement et matériel&lt;/option>
+                        &lt;option>Fournitures de bureau&lt;/option>
+                      &lt;/select>
+                  &lt;/div>
+                  &lt;div class="col-half">
+                    &lt;label for="expense-name" class="bold-label">Nom de la dépense&lt;/label>
+                    &lt;input type="text" class="form-control blue-border" data-testid="expense-name" placeholder="Vol Paris Londres" />
+                  &lt;/div>
+                  &lt;div class="col-half">
+                    &lt;label for="datepicker" class="bold-label">Date&lt;/label>
+                    &lt;input required type="date" class="form-control blue-border" data-testid="datepicker" />
+                  &lt;/div>
+                  &lt;div class="col-half">
+                    &lt;label for="amount" class="bold-label">Montant TTC &lt;/label>
+                    &lt;input required type="number" class="form-control blue-border input-icon input-icon-right" data-testid="amount" placeholder="348"/>
+                  &lt;/div>
+                  &lt;div class="col-half-row">
+                    &lt;div class="flex-col"> 
+                      &lt;label for="vat" class="bold-label">TVA&lt;/label>
+                      &lt;input required type="number" class="form-control blue-border" data-testid="vat" placeholder="70" />
+                    &lt;/div>
+                    &lt;div class="flex-col">
+                      &lt;label for="pct" class="white-text">%&lt;/label>
+                      &lt;input type="number" class="form-control blue-border" data-testid="pct" placeholder="20" />
+                    &lt;/div>
+                  &lt;/div>
+                &lt;/div>
+                &lt;div class="col-md-6">
+                  &lt;div class="col-half">
+                    &lt;label for="commentary" class="bold-label">Commentaire&lt;/label>
+                    &lt;textarea class="form-control blue-border" data-testid="commentary" rows="3">&lt;/textarea>
+                  &lt;/div>
+                  &lt;div class="col-half">
+                    &lt;label for="file" class="bold-label">Justificatif&lt;/label>
+                    &lt;input required type="file" class="form-control blue-border" data-testid="file" accept="image/png, image/jpeg"/>
+                  &lt;/div>
+                &lt;/div>
+            &lt;/div>
+            &lt;div class="row">
+              &lt;div class="col-md-6">
+                &lt;div class="col-half">
+                  &lt;button type="submit" id='btn-send-bill' class="btn btn-primary">Envoyer&lt;/button>
+                &lt;/div>
+              &lt;/div>
+            &lt;/div>
+          &lt;/form>
+        &lt;/div>
+      &lt;/div>
+    &lt;/div>
+  `;
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-app_format.html">app/format</a></li><li><a href="module-app_Router.html">app/Router</a></li><li><a href="module-constants_routes.html">constants/routes</a></li><li><a href="module-constants_usersTest.html">constants/usersTest</a></li><li><a href="module-fixtures_bills.html">fixtures/bills</a></li><li><a href="module-views_Actions.html">views/Actions</a></li><li><a href="module-views_BillsUI.html">views/BillsUI</a></li><li><a href="module-views_DashboardFormUI.html">views/DashboardFormUI</a></li><li><a href="module-views_DashboardUI.html">views/DashboardUI</a></li><li><a href="module-views_ErrorPage.html">views/ErrorPage</a></li><li><a href="module-views_LoadingPage.html">views/LoadingPage</a></li><li><a href="module-views_LoginUI.html">views/LoginUI</a></li><li><a href="module-views_NewBillUI.html">views/NewBillUI</a></li><li><a href="module-views_VerticalLayout.html">views/VerticalLayout</a></li></ul><h3>Classes</h3><ul><li><a href="Bills.html">Bills</a></li><li><a href="Dashboard.html">Dashboard</a></li><li><a href="Firestore.html">Firestore</a></li><li><a href="Login.html">Login</a></li><li><a href="Logout.html">Logout</a></li><li><a href="NewBill.html">NewBill</a></li></ul><h3>Global</h3><ul><li><a href="global.html#card">card</a></li><li><a href="global.html#cards">cards</a></li><li><a href="global.html#filteredBills">filteredBills</a></li><li><a href="global.html#getStatus">getStatus</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue May 25 2021 11:20:18 GMT+0200 (heure d’été d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

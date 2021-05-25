@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: containers/Bills.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: containers/Bills.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// /** @module containers/Bills */
+import { ROUTES_PATH } from "../constants/routes.js";
+import { formatDate, formatStatus } from "../app/format.js";
+import Logout from "./Logout.js";
+
+export default class {
+  /**
+   * Class Bills - Manages the features of the Bill page (landing page for employee pathway)
+   * @class Bills
+   * @param {Object} document - the document (HTML page)
+   * @param {function} onNavigate - the function which is called to navigate to another page
+   * @param {object} firestore - instance of the firestore class
+   * @param {object} localStorage - windows.localStorage, used to store user's login info
+   */
+  constructor({ document, onNavigate, firestore, localStorage }) {
+    this.document = document;
+    this.onNavigate = onNavigate;
+    this.firestore = firestore;
+    const buttonNewBill = document.querySelector(`button[data-testid="btn-new-bill"]`);
+    if (buttonNewBill) buttonNewBill.addEventListener("click", this.handleClickNewBill);
+    const iconEye = document.querySelectorAll(`div[data-testid="icon-eye"]`);
+    if (iconEye.length !== 0)
+      iconEye.forEach((icon) => {
+        icon.addEventListener("click", (e) => this.handleClickIconEye(icon));
+      });
+    new Logout({ document, localStorage, onNavigate });
+  }
+
+  /**
+   * handle the click on the newbill button, navigate to NewBill page
+   * @function
+   * @memberof Bills
+   */
+  handleClickNewBill = (e) => {
+    this.onNavigate(ROUTES_PATH["NewBill"]);
+  };
+
+  /**
+   * handle the click on a see attached file button, display the attached file in a modal
+   * @function
+   * @memberof Bills
+   */
+  handleClickIconEye = (icon) => {
+    const billUrl = icon.getAttribute("data-bill-url");
+    $("#modaleFile").find(".modal-body").html(`&lt;div style='text-align: center;'>&lt;img style='max-width: 100%; max-height: 100%;' src=${billUrl} />&lt;/div>`);
+    $("#modaleFile").modal("show");
+  };
+
+  /**
+   * ask the bills data to the firebase,
+   * filter the bills corresponding to the logged-in user
+   * @function
+   * @async
+   * @memberof Bills
+   * @return {array} bills corresponding to the logged-in user
+   */
+  // not need to cover this function by tests
+  getBills = () => {
+    const userEmail = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).email : "";
+    if (this.firestore) {
+      return this.firestore
+        .bills()
+        .get()
+        .then((snapshot) => {
+          const bills = snapshot.docs.map((doc) => ({ ...doc.data() })).filter((bill) => bill.email === userEmail);
+          return bills;
+        })
+        .catch((error) => error);
+    }
+  };
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-app_format.html">app/format</a></li><li><a href="module-app_Router.html">app/Router</a></li><li><a href="module-constants_routes.html">constants/routes</a></li><li><a href="module-constants_usersTest.html">constants/usersTest</a></li><li><a href="module-fixtures_bills.html">fixtures/bills</a></li><li><a href="module-views_Actions.html">views/Actions</a></li><li><a href="module-views_BillsUI.html">views/BillsUI</a></li><li><a href="module-views_DashboardFormUI.html">views/DashboardFormUI</a></li><li><a href="module-views_DashboardUI.html">views/DashboardUI</a></li><li><a href="module-views_ErrorPage.html">views/ErrorPage</a></li><li><a href="module-views_LoadingPage.html">views/LoadingPage</a></li><li><a href="module-views_LoginUI.html">views/LoginUI</a></li><li><a href="module-views_NewBillUI.html">views/NewBillUI</a></li><li><a href="module-views_VerticalLayout.html">views/VerticalLayout</a></li></ul><h3>Classes</h3><ul><li><a href="Bills.html">Bills</a></li><li><a href="Dashboard.html">Dashboard</a></li><li><a href="Firestore.html">Firestore</a></li><li><a href="Login.html">Login</a></li><li><a href="Logout.html">Logout</a></li><li><a href="NewBill.html">NewBill</a></li></ul><h3>Global</h3><ul><li><a href="global.html#card">card</a></li><li><a href="global.html#cards">cards</a></li><li><a href="global.html#filteredBills">filteredBills</a></li><li><a href="global.html#getStatus">getStatus</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue May 25 2021 11:20:18 GMT+0200 (heure d’été d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,3 +1,8 @@
+/**@module fixtures/bills */
+/**
+ * @const {array} bills - array of 4 bills
+ * to be use as sample for tests
+ */
 export const bills = [{
   "id": "47qAXb6fIm2zOKkLzMro",
   "vat": "80",
