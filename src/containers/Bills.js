@@ -65,7 +65,7 @@ export default class {
           const bills = snapshot.docs.map((doc) => ({ ...doc.data() })).filter((bill) => bill.email === userEmail);
           return bills;
         })
-        .catch((error) => error);
+        .catch((error) => Promise.reject(Error(error)));
     }
   };
 }
