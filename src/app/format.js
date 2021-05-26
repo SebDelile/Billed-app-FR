@@ -33,27 +33,3 @@ export const formatStatus = (status) => {
       return "Refusé";
   }
 };
-
-/**
- * const frenchMonths - the table of the 12 french formatted months
- * @const {array} frenchMonths
- */
-const frenchMonths = [];
-for (let i = 0; i < 12; i++) {
-  frenchMonths.push(new Intl.DateTimeFormat("fr", { month: "short" }).format(new Date(2000, i)));
-}
-
-/**
- * function formatDateReverse - reverse the formatDate function to get a date from a formated date
- * for example : 23 Avr. 21 => 2021-04-23
- * @function formatDateReverse
- * @param {string} formatedDate - a date having been formatted by formatDate
- * @return {date} the corresponding date as date object
- */
-export const formatDateReverse = (formatedDate) => {
-  let [day, month, year] = formatedDate.split(" ");
-  day = parseInt(day);
-  month = frenchMonths.findIndex((element) => element === month.toLowerCase());
-  year = parseInt(year) < 70 ? 2000 + parseInt(year) : 1900 + parseInt(year);
-  return new Date(year, month, day);
-};

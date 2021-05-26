@@ -2,7 +2,7 @@
 import VerticalLayout from "./VerticalLayout.js";
 import ErrorPage from "./ErrorPage.js";
 import LoadingPage from "./LoadingPage.js";
-import { formatDate, formatStatus, formatDateReverse } from "../app/format.js";
+import { formatDate, formatStatus } from "../app/format.js";
 import Actions from "./Actions.js";
 
 /**
