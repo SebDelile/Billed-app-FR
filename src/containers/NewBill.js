@@ -48,9 +48,40 @@ export default class NewBill {
         .then((url) => {
           this.fileUrl = url;
           this.fileName = fileName;
-        });
+        })
+        .catch(() => this.inputFileReset());
     } else {
-      this.document.querySelector(`input[data-testid="file"]`).value = "";
+      this.inputFileReset();
+    }
+  };
+
+  /**
+   * reset the input[type=file]
+   * launch in case the extension o not match the requierement or in case of failure to upload the file
+   * first try is a soft method
+   * in case the navigator does not support the soft, do a hard reset
+   * the hard reset is the replacement of the input with a new one with the same attributes and event listeners
+   * @function
+   * @memberof NewBill
+   */
+  inputFileReset = () => {
+    this.fileUrl = "";
+    this.fileName = "";
+    const inputFile = document.querySelector(`input[data-testid="file"]`);
+    try {
+      // clear the list in most of the cases
+      inputFile.value = "";
+    } catch {
+      // in some cases, it throw an error due to security issues on input[type=file]
+      // so it needs a hard reset of inputFile
+      let newInputFile = document.createElement("input");
+      newInputFile.setAttribute("required", true);
+      newInputFile.setAttribute("type", "file");
+      newInputFile.setAttribute("data-testid", "file");
+      newInputFile.setAttribute("accept", "image/png, image/jpeg");
+      newInputFile.classList.add("form-control", "blue-border");
+      inputFile.replaceWith(newInputFile);
+      newInputFile.addEventListener("change", (e) => this.handleChangeFile(e));
     }
   };
 
