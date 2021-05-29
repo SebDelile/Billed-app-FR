@@ -5,18 +5,17 @@ import { bills } from "../fixtures/bills.js";
 import { ROUTES } from "../constants/routes";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import firebaseMock from "../__mocks__/firebase";
-import firestoreMock from "../__mocks__/firestore.js";
-import firestore from "../app/Firestore.js"
-import router from "../app/Router.js"
+import firestore from "../app/Firestore.js";
+import router from "../app/Router.js";
 
 //setup for tests
-const onNavigateOriginal = (pathname) => {
-  document.body.innerHTML = ROUTES({ pathname });
-};
+const flushPromises = async () => new Promise(setImmediate); // wait for promises to be resolved before continue the code
 
 class InitiateBills {
-  constructor({ onNavigateFunction = onNavigateOriginal, billsSample = bills, error = false, loading = false } = {}) {
-    const onNavigate = onNavigateFunction;
+  constructor({billsSample = bills, error = false, loading = false } = {}) {
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
     Object.defineProperty(window, "localStorage", { value: localStorageMock });
     window.localStorage.setItem(
       "user",
@@ -30,9 +29,30 @@ class InitiateBills {
     this.object = new Bills({
       document,
       onNavigate,
-      firestore: firestore,
+      firestore: null,
       localStorage: window.localStorage,
     });
+  }
+}
+
+class InitiateRouterToBills{
+  constructor() {
+    document.body.innerHTML = `<div id='root'></div>`;
+    Object.defineProperty(window, "location", {
+      value: {
+        pathname: "/",
+        hash: "#employee/bills",
+      },
+    });
+    Object.defineProperty(window, "localStorage", { value: localStorageMock });
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+        email: "a@a",
+      })
+    );
+    router();
   }
 }
 //end of setup
@@ -81,20 +101,27 @@ describe("Given I am connected as an employee", () => {
     });
   });
   describe("When I am on Bills page and I click on the submit a new bill button", () => {
-    test("Then, the router should be called to go to the newBill page", () => {
-      const onNavigate = jest.fn();
-      new InitiateBills({ onNavigateFunction: onNavigate });
+    test("Then, the submit a new bill handler should be run", () => {
+      const initiateBills = new InitiateBills();
+      initiateBills.object.handleClickNewBill = jest.fn();
       document.querySelector(`button[data-testid="btn-new-bill"]`).click();
-      expect(onNavigate).toHaveBeenCalledWith("#employee/bill/new");
+      expect(initiateBills.object.handleClickNewBill).toBeCalled();
     });
   });
   describe("When I am on Bills page and I click on the iconEye of one of the bills", () => {
-    test.only("Then, the open modal handler should be run", () => {
+    test("Then, the open modal handler should be run", () => {
       const initiateBills = new InitiateBills();
-      const getSpy = jest.spyOn(initiateBills.object, "handleClickIconEye");
-      $.fn.modal = jest.fn(); //modal is a Bootstrap function, not reachable here
+      initiateBills.object.handleClickIconEye = jest.fn();
       document.querySelector(`div[data-testid="icon-eye"]`).click();
-      expect(getSpy).toBeCalled();
+      expect(initiateBills.object.handleClickIconEye).toBeCalled();
+    });
+  });
+  describe("When I am on Bills page and I click on the submit a new bill button", () => {
+    test("Then, the router should be called to go to the newBill page", () => {
+      const initiateBills = new InitiateBills();
+      initiateBills.object.onNavigate = jest.fn();
+      initiateBills.object.handleClickNewBill();
+      expect(initiateBills.object.onNavigate).toHaveBeenCalledWith("#employee/bill/new");
     });
   });
   describe("When I am on Bills page and I open the modal", () => {
@@ -111,79 +138,35 @@ describe("Given I am connected as an employee", () => {
 
 // Integration tests
 describe("Given I am a user connected as Employee", () => {
-  describe("When I navigate to Bills page", () => {
-    test("fetches bills from mock API GET", async () => {
-      const getSpy = jest.spyOn(firebaseMock, "get");
-      const initiateBills = new InitiateBills({ billsSample: [] });
-      const receivedBills = await initiateBills.object.getBills();
-      expect(getSpy).toHaveBeenCalled();
-      expect(receivedBills.length).toEqual(4);
-    });
-
-    /* SECOND FETCH ASSAY BY USING THE ROUTER TO BE AS CLOSED AS POSSIBLE OF THE REAL APP
-    * It doesn't work
-    * Router instanciates Bills then call getBills (app/router.js line 58)
-    * then it goes to "get()" (containers/Bills.js line 63) then it goes to the __mock__/firebase.js as requiered
-    * then it enters inside the "then()" block of getBills (containers/Bills.js line 64)
-    * but then it goes to the expect statements (__tests__/Bills.js line 156) instead of going into the "then()" block of the router (app/router.js line 108)
-    * so the bills are not yet inserted in th UI when the expect statement is resolved.
-    * according to the diagram : spec/sequence_low-User_login.png, the expect() statement is checked after the step #24 or #25 instead of #26
-
+  describe("When I land on Bills Page", () => {
     test("fetches bills from mock API GET", async () => {
       firestore.bills = jest.fn(function () {
         return firebaseMock;
       });
       const getSpy = jest.spyOn(firebaseMock, "get");
-      let rootNode = document.createElement("div");
-      rootNode.setAttribute("id", "root");
-      document.body.appendChild(rootNode);
-      Object.defineProperty(window, "location", {
-        value: {
-          pathname: "/",
-          hash: "#employee/bills",
-        },
-      });
-      Object.defineProperty(window, "localStorage", { value: localStorageMock });
-      window.localStorage.setItem(
-        "user",
-        JSON.stringify({
-          type: "Employee",
-          email: "a@a",
-        })
-      );
-      expect.assertions(2);
-      await router()
+      new InitiateRouterToBills()
+      await flushPromises(); // router() : getBills().then() promise
       expect(getSpy).toHaveBeenCalled();
-      expect(document.querySelectorAll(".tbody[data-testid='tbody'] tr").length).toEqual(4);
-    });*/
+      const numberOfLines = document.querySelectorAll("tbody[data-testid='tbody'] tr").length;
+      expect(numberOfLines).toEqual(4);
+    });
     test("fetches bills from an API and fails with 404 message error", async () => {
-      firebaseMock.get.mockImplementationOnce(() => Promise.reject(Error("Erreur 404")));
-      let html;
-      try {
-        const response = await firebaseMock.get();
-        html = BillsUI({ data: response });
-      } catch (e) {
-        html = BillsUI({ error: e });
-      }
-      document.body.innerHTML = html;
-      const message = screen.getByText(/Erreur 404/);
-      expect(message).toBeTruthy();
-    });
-    test("fetches messages from an API and fails with 500 message error", async () => {
-      firebaseMock.get.mockImplementationOnce(() => Promise.reject(Error("Erreur 500")));
-      const initiateBills = new InitiateBills({ billsSample: [] });
-      const response = await initiateBills.object.getBills();
-      if (response instanceof Error) {
-        new InitiateBills({ error: response });
-      }
-      const message = screen.getByText(/Erreur 500/);
-      expect(message).toBeTruthy();
-    });
-
-    /* SECOND ATTEMPT TO REALLY CATCH ERRORS WITH THE APP
-    * The idea is to do the same as the fetch attempt ie. calling the router to be as closed as possible to the app,
-    * the error can be throw by using the firebaseMock mockimplementation as line 173 of this file
-    * However the async issue is the same and it doesn't work as the "expect()" is resolve before the "then()" of the router
-    */
-  });
+      firestore.bills = jest.fn(function () {
+        return firebaseMock;
+      });
+      firebaseMock.get = jest.fn(() => Promise.reject(Error("Erreur 404")));
+      new InitiateRouterToBills()
+      await flushPromises(); // router() : getBills().then() promise
+      expect(screen.getByText(/Erreur 404/)).toBeTruthy();;
+    })
+    test("fetches bills from an API and fails with 500 message error", async () => {
+      firestore.bills = jest.fn(function () {
+        return firebaseMock;
+      });
+      firebaseMock.get = jest.fn(() => Promise.reject(Error("Erreur 500")));
+      new InitiateRouterToBills()
+      await flushPromises(); // router() : getBills().then() promise
+      expect(screen.getByText(/Erreur 500/)).toBeTruthy();
+    })
+  })
 });

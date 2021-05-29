@@ -6,9 +6,13 @@ export default {
   },
   storage: {
     ref: function(){
-      this.isCalled = true // to spy the call of the firestore
+      //this.isCalled = true // to spy the call of the firestore
       return this
     },
-    put: async () => Promise.resolve({ref: {getDownloadURL: () => "fakepath.from.firebase"}})
+    put: async () => Promise.resolve({
+      ref: {
+        getDownloadURL: () => "fakepath.from.firebase"
+      }
+    })
   }
 }

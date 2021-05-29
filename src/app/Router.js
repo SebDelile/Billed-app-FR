@@ -15,7 +15,7 @@ import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
  * take the hash of the URL then build the corresponding UI and instanciate the corresponding class
  * @function
  */
-export default () => {
+export default async () => {
   const rootDiv = document.getElementById("root");
   rootDiv.innerHTML = ROUTES({ pathname: window.location.pathname });
 

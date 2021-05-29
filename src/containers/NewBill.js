@@ -16,14 +16,13 @@ export default class NewBill {
     this.onNavigate = onNavigate;
     this.firestore = firestore;
     const formNewBill = this.document.querySelector(`form[data-testid="form-new-bill"]`);
-    formNewBill.addEventListener("submit", this.handleSubmit);
+    formNewBill.addEventListener("submit", (e) => this.handleSubmit(e));
     const file = this.document.querySelector(`input[data-testid="file"]`);
-    file.addEventListener("change", this.handleChangeFile);
+    file.addEventListener("change", (e) => this.handleChangeFile(e));
     this.fileUrl = null;
     this.fileName = null;
     new Logout({ document, localStorage, onNavigate });
   }
-
   /**
    * handle the submission of a file as attached file,
    * exctract filename and file extension from input.value
@@ -35,7 +34,7 @@ export default class NewBill {
    * @function
    * @memberof NewBill
    */
-  handleChangeFile = (e) => {
+  handleChangeFile = async (e) => {
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0];
     const filePath = e.target.value.split(/\\/g);
     const fileName = filePath[filePath.length - 1];
@@ -122,7 +121,7 @@ export default class NewBill {
       status: "pending",
     };
     this.createBill(bill);
-    this.onNavigate(ROUTES_PATH["Bills"]);
+    //this.onNavigate(ROUTES_PATH["Bills"]);
   };
 
   /**
@@ -134,7 +133,7 @@ export default class NewBill {
    * @param {object} bill - the submitted bill
    */
   // not need to cover this function by tests
-  createBill = (bill) => {
+  createBill(bill) {
     if (this.firestore) {
       this.firestore
         .bills()
@@ -142,7 +141,9 @@ export default class NewBill {
         .then(() => {
           this.onNavigate(ROUTES_PATH["Bills"]);
         })
-        .catch((error) => error);
+        .catch((error) => {
+          window.alert("Une erreur est survenue : " + error)
+        });
     }
-  };
+  }
 }
