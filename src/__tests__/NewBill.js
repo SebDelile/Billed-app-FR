@@ -71,9 +71,8 @@ class FillTheForm {
     document.querySelector(`input[data-testid="pct"]`).value = pct;
     document.querySelector(`textarea[data-testid="commentary"]`).value = commentary;
     if (file !== "") {
-      const inputFile = document.querySelector(`input[data-testid="file"]`);
-      Object.defineProperty(inputFile, "value", { value: "fakepath/sample.png" });
-      fireEvent.change(inputFile, {
+      Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.png" });
+      fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
         target: {
           files: [file],
         },
@@ -136,9 +135,8 @@ describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page and I add an image attached file", () => {
     test("Then the image should be accepted by the app ", () => {
       new InitiateNewBill();
-      const inputFile = document.querySelector(`input[data-testid="file"]`);
-      Object.defineProperty(inputFile, "value", { value: "fakepath/sample.png" });
-      fireEvent.change(inputFile, {
+      Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.png" });
+      fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
         target: {
           files: [new File(["sample"], "sample.png", { type: "image/png" })],
         },
@@ -150,15 +148,33 @@ describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page and I add a non-image attached file", () => {
     test("Then the image should be rejected by the app ", async () => {
       new InitiateNewBill();
-      const inputFile = document.querySelector(`input[data-testid="file"]`);
-      Object.defineProperty(inputFile, "value", { value: "fakepath/sample.txt" });
-      fireEvent.change(inputFile, {
+      Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.txt" });
+      fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
         target: {
           files: [new File(["sample"], "sample.txt", { type: "text/plain" })],
         },
       });
       const numberOfFile = document.querySelector(`input[data-testid="file"]`).files.length;
       expect(numberOfFile).toEqual(0);
+    });
+  });
+  describe("When I am on NewBill Page and I add an image attached file after having a rejected one", () => {
+    test("Then the image should be accepted by the app ", () => {
+      new InitiateNewBill();
+      Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.txt" });
+      fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
+        target: {
+          files: [new File(["sample"], "sample.txt", { type: "text/plain" })],
+        },
+      });
+      Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.png" });
+      fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
+        target: {
+          files: [new File(["sample"], "sample.png", { type: "image/png" })],
+        },
+      });
+      const numberOfFile = document.querySelector(`input[data-testid="file"]`).files.length;
+      expect(numberOfFile).toEqual(1);
     });
   });
   describe("When I am on NewBill Page and I fill the form correctly and submit", () => {
@@ -280,9 +296,8 @@ describe("Given I am connected as an employee", () => {
       const putSpy = jest.spyOn(firestore.storage, "put");
       new InitiateRouterToNewBill();
       const file = new File(["sample"], "sample.png", { type: "image/png" });
-      const inputFile = document.querySelector(`input[data-testid="file"]`);
-      Object.defineProperty(inputFile, "value", { value: "fakepath/sample.png" });
-      fireEvent.change(inputFile, {
+      Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.png" });
+      fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
         target: {
           files: [file],
         },
@@ -297,9 +312,8 @@ describe("Given I am connected as an employee", () => {
       jest.spyOn(firestore.storage, "put").mockRejectedValueOnce(Error("Any error"));
       new InitiateRouterToNewBill();
       const file = new File(["sample"], "sample.png", { type: "image/png" });
-      const inputFile = document.querySelector(`input[data-testid="file"]`);
-      Object.defineProperty(inputFile, "value", { value: "fakepath/sample.png" });
-      fireEvent.change(inputFile, {
+      Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.png" });
+      fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
         target: {
           files: [file],
         },
