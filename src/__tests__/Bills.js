@@ -2,19 +2,25 @@ import { screen } from "@testing-library/dom";
 import Bills from "../containers/Bills.js";
 import BillsUI from "../views/BillsUI.js";
 import { bills } from "../fixtures/bills.js";
-import { ROUTES } from "../constants/routes";
 import { localStorageMock } from "../__mocks__/localStorage.js";
-import firebaseMock from "../__mocks__/firebase";
-import firestore from "../app/Firestore.js";
+import mockFirebase from "../__mocks__/firebase";
 import router from "../app/Router.js";
+import firestore from "../app/Firestore.js";
+jest.mock("../app/Firestore.js", () => {
+  return {
+    bills: function () {
+      return mockFirebase;
+    },
+  };
+});
 
 //setup for tests
-const flushPromises = async () => new Promise(setImmediate); // wait for promises to be resolved before continue the code
+const flushPromises = async () => new Promise(setImmediate); // wait for any pending promise to be resolved before continue the code
 
 class InitiateBills {
-  constructor({billsSample = bills, error = false, loading = false } = {}) {
-    const onNavigate = (pathname) => {
-      document.body.innerHTML = ROUTES({ pathname });
+  constructor({ billsSample = bills, error = false, loading = false } = {}) {
+    const onNavigate = () => {
+      return;
     };
     Object.defineProperty(window, "localStorage", { value: localStorageMock });
     window.localStorage.setItem(
@@ -24,8 +30,7 @@ class InitiateBills {
         email: "a@a",
       })
     );
-    const html = BillsUI({ data: billsSample, error: error, loading: loading });
-    document.body.innerHTML = html;
+    document.body.innerHTML = BillsUI({ data: billsSample, error: error, loading: loading });
     this.object = new Bills({
       document,
       onNavigate,
@@ -35,7 +40,7 @@ class InitiateBills {
   }
 }
 
-class InitiateRouterToBills{
+class InitiateRouterToBills {
   constructor() {
     document.body.innerHTML = `<div id='root'></div>`;
     Object.defineProperty(window, "location", {
@@ -59,25 +64,30 @@ class InitiateRouterToBills{
 
 describe("Given I am connected as an employee", () => {
   // Unit tests
+  describe("When I access Bills Page", () => {
+    test("Then the Bills page should be rendered", () => {
+      document.body.innerHTML = BillsUI({ data: bills });
+      expect(screen.getAllByText("Mes notes de frais")).toBeTruthy();
+    });
+  });
   describe("When I am on Bills Page and there are bills", () => {
     test("Then bills should be ordered from earliest to latest", () => {
       const frenchMonths = [];
       for (let i = 0; i < 12; i++) {
         frenchMonths.push(new Intl.DateTimeFormat("fr", { month: "short" }).format(new Date(2000, i)));
       }
-      //to reverse the formated date into a date object
       const formatDateReverse = (formatedDate) => {
         let [day, month, year] = formatedDate.split(" ");
         day = parseInt(day);
         month = frenchMonths.findIndex((element) => element === month.toLowerCase());
-        year = parseInt(year) < 70 ? 2000 + parseInt(year) : 1900 + parseInt(year);
+        year = parseInt(year) < 70 ? 2000 + parseInt(year) : 1900 + parseInt(year); //arbitrary range for year : 1970-2069
         return new Date(year, month, day);
       };
+      const antiChronoSort = (a, b) => (formatDateReverse(a) < formatDateReverse(b) ? 1 : -1);
 
       document.body.innerHTML = BillsUI({ data: bills });
       const dates = Array.from(document.body.querySelectorAll("#data-table tbody>tr>td:nth-child(3)")).map((a) => a.innerHTML);
-      const antiChrono = (a, b) => (formatDateReverse(a) < formatDateReverse(b) ? 1 : -1);
-      const datesSorted = [...dates].sort(antiChrono);
+      const datesSorted = [...dates].sort(antiChronoSort);
       expect(dates).toEqual(datesSorted);
     });
   });
@@ -140,33 +150,24 @@ describe("Given I am connected as an employee", () => {
 describe("Given I am a user connected as Employee", () => {
   describe("When I land on Bills Page", () => {
     test("fetches bills from mock API GET", async () => {
-      firestore.bills = jest.fn(function () {
-        return firebaseMock;
-      });
-      const getSpy = jest.spyOn(firebaseMock, "get");
-      new InitiateRouterToBills()
+      const getSpy = jest.spyOn(mockFirebase, "get");
+      new InitiateRouterToBills();
       await flushPromises(); // router() : getBills().then() promise
       expect(getSpy).toHaveBeenCalled();
       const numberOfLines = document.querySelectorAll("tbody[data-testid='tbody'] tr").length;
       expect(numberOfLines).toEqual(4);
     });
     test("fetches bills from an API and fails with 404 message error", async () => {
-      firestore.bills = jest.fn(function () {
-        return firebaseMock;
-      });
-      firebaseMock.get = jest.fn(() => Promise.reject(Error("Erreur 404")));
-      new InitiateRouterToBills()
+      jest.spyOn(mockFirebase, "get").mockRejectedValueOnce(Error("Erreur 404"));
+      new InitiateRouterToBills();
       await flushPromises(); // router() : getBills().then() promise
-      expect(screen.getByText(/Erreur 404/)).toBeTruthy();;
-    })
+      expect(screen.getByText(/Erreur 404/)).toBeTruthy();
+    });
     test("fetches bills from an API and fails with 500 message error", async () => {
-      firestore.bills = jest.fn(function () {
-        return firebaseMock;
-      });
-      firebaseMock.get = jest.fn(() => Promise.reject(Error("Erreur 500")));
-      new InitiateRouterToBills()
+      jest.spyOn(mockFirebase, "get").mockRejectedValueOnce(Error("Erreur 500"));
+      new InitiateRouterToBills();
       await flushPromises(); // router() : getBills().then() promise
       expect(screen.getByText(/Erreur 500/)).toBeTruthy();
-    })
-  })
+    });
+  });
 });

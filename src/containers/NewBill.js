@@ -121,7 +121,6 @@ export default class NewBill {
       status: "pending",
     };
     this.createBill(bill);
-    //this.onNavigate(ROUTES_PATH["Bills"]);
   };
 
   /**
