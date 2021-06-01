@@ -5,102 +5,58 @@ import NewBill from "../containers/NewBill.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import router from "../app/Router.js";
 import mockFirebase from "../__mocks__/firebase";
-//import mockFirestore from "../__mocks__/firestore.js";
+import mockOnNavigate from "../__mocks__/onNavigate.js";
 import firestore from "../app/Firestore.js";
-jest.mock("../app/Firestore.js", () => {
-  return {
-    bills: function () {
-      return mockFirebase;
-    },
-    storage: {
-      ref: function () {
-        return this;
-      },
-      put: async () =>
-        Promise.resolve({
-          ref: {
-            getDownloadURL: () => "fakepath.from.firebase",
-          },
-        }),
-    },
-  };
-});
+jest.mock("../app/Firestore.js");
+
 
 //setup for tests
-const flushPromises = async () => new Promise(setImmediate); // wait for any pending promise to be resolved before continue the code
 
-class InitiateNewBill {
-  constructor() {
-    const onNavigate = () => {
-      return;
-    };
-    Object.defineProperty(window, "localStorage", { value: localStorageMock });
-    window.localStorage.setItem(
-      "user",
-      JSON.stringify({
-        type: "Employee",
-        email: "a@a",
-      })
-    );
-    document.body.innerHTML = NewBillUI();
-    this.object = new NewBill({
-      document,
-      onNavigate,
-      firestore: firestore,
-      localStorage: window.localStorage,
-    });
-  }
-}
+Object.defineProperty(window, "localStorage", { value: localStorageMock });
+window.localStorage.setItem(
+  "user",
+  JSON.stringify({
+    type: "Employee",
+    email: "a@a",
+  })
+);
 
-class FillTheForm {
-  constructor({
-    type = "Restaurants et bars",
-    name = "Pot",
-    amount = "100",
-    date = "2021-05-01",
-    vat = "20",
-    pct = "20",
-    commentary = "YOLO",
-    file = new File(["sample"], "sample.png", { type: "image/png" }),
-  } = {}) {
-    document.querySelector(`select[data-testid="expense-type"]`).value = type;
-    document.querySelector(`input[data-testid="expense-name"]`).value = name;
-    document.querySelector(`input[data-testid="amount"]`).value = amount;
-    document.querySelector(`input[data-testid="datepicker"]`).value = date;
-    document.querySelector(`input[data-testid="vat"]`).value = vat;
-    document.querySelector(`input[data-testid="pct"]`).value = pct;
-    document.querySelector(`textarea[data-testid="commentary"]`).value = commentary;
-    if (file !== "") {
-      Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.png" });
-      fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
-        target: {
-          files: [file],
-        },
-      });
-    }
-  }
-}
+Object.defineProperty(window, "location", {
+  value: {
+    pathname: "/",
+    hash: "#employee/bill/new",
+  },
+});
 
-class InitiateRouterToNewBill {
-  constructor() {
-    document.body.innerHTML = `<div id='root'></div>`;
-    Object.defineProperty(window, "location", {
-      value: {
-        pathname: "/",
-        hash: "#employee/bill/new",
+const fillTheNewBillForm = ({
+  type = "Restaurants et bars",
+  name = "Pot",
+  amount = "100",
+  date = "2021-05-01",
+  vat = "20",
+  pct = "20",
+  commentary = "YOLO",
+  file = new File(["sample"], "sample.png", { type: "image/png" }),
+} = {}) => {
+  document.querySelector(`select[data-testid="expense-type"]`).value = type;
+  document.querySelector(`input[data-testid="expense-name"]`).value = name;
+  document.querySelector(`input[data-testid="amount"]`).value = amount;
+  document.querySelector(`input[data-testid="datepicker"]`).value = date;
+  document.querySelector(`input[data-testid="vat"]`).value = vat;
+  document.querySelector(`input[data-testid="pct"]`).value = pct;
+  document.querySelector(`textarea[data-testid="commentary"]`).value = commentary;
+  if (file !== "") {
+    Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.png" });
+    fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
+      target: {
+        files: [file],
       },
     });
-    Object.defineProperty(window, "localStorage", { value: localStorageMock });
-    window.localStorage.setItem(
-      "user",
-      JSON.stringify({
-        type: "Employee",
-        email: "a@a",
-      })
-    );
-    router();
   }
-}
+};
+
+const flushPromises = async () => new Promise(setImmediate); // wait for any pending promise to be resolved before continue the code
+
 //end of setup
 
 describe("Given I am connected as an employee", () => {
@@ -117,24 +73,42 @@ describe("Given I am connected as an employee", () => {
   });
   describe("When I am on NewBill Page and I add an image attached file", () => {
     test("Then the file handler should be run", () => {
-      const initiateNewBill = new InitiateNewBill();
-      initiateNewBill.object.handleChangeFile = jest.fn();
+      document.body.innerHTML = NewBillUI();
+      const newBill = new NewBill({
+        document,
+        mockOnNavigate,
+        firestore: firestore,
+        localStorage: window.localStorage,
+      });
+      newBill.handleChangeFile = jest.fn();
       fireEvent.change(document.querySelector(`input[data-testid="file"]`));
-      expect(initiateNewBill.object.handleChangeFile).toBeCalled();
+      expect(newBill.handleChangeFile).toBeCalled();
     });
   });
   describe("When I am on NewBill Page and I click on submit button", () => {
     test("Then the submit handler should be run", () => {
-      const initiateNewBill = new InitiateNewBill();
-      initiateNewBill.object.handleSubmit = jest.fn();
+      document.body.innerHTML = NewBillUI();
+      const newBill = new NewBill({
+        document,
+        mockOnNavigate,
+        firestore: firestore,
+        localStorage: window.localStorage,
+      });
+      newBill.handleSubmit = jest.fn();
       fireEvent.submit(document.getElementById("btn-send-bill"));
-      expect(initiateNewBill.object.handleSubmit).toBeCalled();
+      expect(newBill.handleSubmit).toBeCalled();
     });
   });
 
   describe("When I am on NewBill Page and I add an image attached file", () => {
     test("Then the image should be accepted by the app ", () => {
-      new InitiateNewBill();
+      document.body.innerHTML = NewBillUI();
+      new NewBill({
+        document,
+        mockOnNavigate,
+        firestore: firestore,
+        localStorage: window.localStorage,
+      });
       Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.png" });
       fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
         target: {
@@ -147,7 +121,13 @@ describe("Given I am connected as an employee", () => {
   });
   describe("When I am on NewBill Page and I add a non-image attached file", () => {
     test("Then the image should be rejected by the app ", async () => {
-      new InitiateNewBill();
+      document.body.innerHTML = NewBillUI();
+      new NewBill({
+        document,
+        mockOnNavigate,
+        firestore: firestore,
+        localStorage: window.localStorage,
+      });
       Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.txt" });
       fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
         target: {
@@ -160,7 +140,13 @@ describe("Given I am connected as an employee", () => {
   });
   describe("When I am on NewBill Page and I add an image attached file after having a rejected one", () => {
     test("Then the image should be accepted by the app ", () => {
-      new InitiateNewBill();
+      document.body.innerHTML = NewBillUI();
+      new NewBill({
+        document,
+        mockOnNavigate,
+        firestore: firestore,
+        localStorage: window.localStorage,
+      });
       Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.txt" });
       fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
         target: {
@@ -179,17 +165,23 @@ describe("Given I am connected as an employee", () => {
   });
   describe("When I am on NewBill Page and I fill the form correctly and submit", () => {
     test("Then the form should be sent with filled data", async () => {
-      const newBill = new InitiateNewBill();
-      new FillTheForm();
+      document.body.innerHTML = NewBillUI();
+      const newBill = new NewBill({
+        document,
+        mockOnNavigate,
+        firestore: firestore,
+        localStorage: window.localStorage,
+      });
+      fillTheNewBillForm();
       await flushPromises(); // handleChangeFile promise
       let sentBill = {};
-      newBill.object.createBill = jest.fn(function (bill) {
+      newBill.createBill = jest.fn(function (bill) {
         Object.keys(bill).forEach((key) => (sentBill[key] = bill[key]));
       });
       let e = new Event("submit"); // in order to "e.target" statements of handleSubmit to work
       Object.defineProperty(e, "target", { value: document.querySelector("form") });
-      newBill.object.handleSubmit(e);
-      expect(newBill.object.createBill).toHaveBeenCalled();
+      newBill.handleSubmit(e);
+      expect(newBill.createBill).toHaveBeenCalled();
       expect(sentBill.email).toEqual("a@a");
       expect(sentBill.type).toEqual("Restaurants et bars");
       expect(sentBill.name).toEqual("Pot");
@@ -205,86 +197,122 @@ describe("Given I am connected as an employee", () => {
   });
   describe("When I am on NewBill Page and I uncorrectly fill the form and submit (missing value for expense type)", () => {
     test("Then the form should not be sent and the field expense type should be focussed", () => {
-      const newBill = new InitiateNewBill();
-      new FillTheForm({ type: "" });
+      document.body.innerHTML = NewBillUI();
+      const newBill = new NewBill({
+        document,
+        mockOnNavigate,
+        firestore: firestore,
+        localStorage: window.localStorage,
+      });
+      fillTheNewBillForm({ type: "" });
       window.alert = jest.fn();
-      newBill.object.createBill = jest.fn();
+      newBill.createBill = jest.fn();
       let e = new Event("submit"); // in order to "e.target" statements of handleSubmit to work
       Object.defineProperty(e, "target", { value: document.querySelector("form") });
-      newBill.object.handleSubmit(e);
-      expect(newBill.object.createBill).not.toBeCalled();
+      newBill.handleSubmit(e);
+      expect(newBill.createBill).not.toBeCalled();
       expect(window.alert).toBeCalled();
       expect(document.activeElement).toEqual(document.querySelector(`select[data-testid="expense-type"]`));
     });
   });
   describe("When I am on NewBill Page and I uncorrectly fill the form and submit (missing value for date)", () => {
     test("Then the form should not be sent and the field date should be focussed", () => {
-      const newBill = new InitiateNewBill();
-      new FillTheForm({ date: "" });
+      document.body.innerHTML = NewBillUI();
+      const newBill = new NewBill({
+        document,
+        mockOnNavigate,
+        firestore: firestore,
+        localStorage: window.localStorage,
+      });
+      fillTheNewBillForm({ date: "" });
       window.alert = jest.fn();
-      newBill.object.createBill = jest.fn();
+      newBill.createBill = jest.fn();
       let e = new Event("submit"); // in order to "e.target" statements of handleSubmit to work
       Object.defineProperty(e, "target", { value: document.querySelector("form") });
-      newBill.object.handleSubmit(e);
-      expect(newBill.object.createBill).not.toBeCalled();
+      newBill.handleSubmit(e);
+      expect(newBill.createBill).not.toBeCalled();
       expect(window.alert).toBeCalled();
       expect(document.activeElement).toEqual(document.querySelector(`input[data-testid="datepicker"]`));
     });
   });
   describe("When I am on NewBill Page and I uncorrectly fill the form and submit (missing value for amount)", () => {
     test("Then the form should not be sent and the field amount should be focussed", () => {
-      const newBill = new InitiateNewBill();
-      new FillTheForm({ amount: "" });
+      document.body.innerHTML = NewBillUI();
+      const newBill = new NewBill({
+        document,
+        mockOnNavigate,
+        firestore: firestore,
+        localStorage: window.localStorage,
+      });
+      fillTheNewBillForm({ amount: "" });
       window.alert = jest.fn();
-      newBill.object.createBill = jest.fn();
+      newBill.createBill = jest.fn();
       let e = new Event("submit"); // in order to "e.target" statements of handleSubmit to work
       Object.defineProperty(e, "target", { value: document.querySelector("form") });
-      newBill.object.handleSubmit(e);
-      expect(newBill.object.createBill).not.toBeCalled();
+      newBill.handleSubmit(e);
+      expect(newBill.createBill).not.toBeCalled();
       expect(window.alert).toBeCalled();
       expect(document.activeElement).toEqual(document.querySelector(`input[data-testid="amount"]`));
     });
   });
   describe("When I am on NewBill Page and I uncorrectly fill the form and submit (missing value for VAT)", () => {
     test("Then the form should not be sent and the field VAT should be focussed", () => {
-      const newBill = new InitiateNewBill();
-      new FillTheForm({ vat: "" });
+      document.body.innerHTML = NewBillUI();
+      const newBill = new NewBill({
+        document,
+        mockOnNavigate,
+        firestore: firestore,
+        localStorage: window.localStorage,
+      });
+      fillTheNewBillForm({ vat: "" });
       window.alert = jest.fn();
-      newBill.object.createBill = jest.fn();
+      newBill.createBill = jest.fn();
       let e = new Event("submit"); // in order to "e.target" statements of handleSubmit to work
       Object.defineProperty(e, "target", { value: document.querySelector("form") });
-      newBill.object.handleSubmit(e);
-      expect(newBill.object.createBill).not.toBeCalled();
+      newBill.handleSubmit(e);
+      expect(newBill.createBill).not.toBeCalled();
       expect(window.alert).toBeCalled();
       expect(document.activeElement).toEqual(document.querySelector(`input[data-testid="vat"]`));
     });
   });
   describe("When I am on NewBill Page and I uncorrectly fill the form and submit (missing file)", () => {
     test("Then the form should not be sent and the field file should be focussed", () => {
-      const newBill = new InitiateNewBill();
-      new FillTheForm({ file: "" });
+      document.body.innerHTML = NewBillUI();
+      const newBill = new NewBill({
+        document,
+        mockOnNavigate,
+        firestore: firestore,
+        localStorage: window.localStorage,
+      });
+      fillTheNewBillForm({ file: "" });
       window.alert = jest.fn();
-      newBill.object.createBill = jest.fn();
+      newBill.createBill = jest.fn();
       let e = new Event("submit"); // in order to "e.target" statements of handleSubmit to work
       Object.defineProperty(e, "target", { value: document.querySelector("form") });
-      newBill.object.handleSubmit(e);
-      expect(newBill.object.createBill).not.toBeCalled();
+      newBill.handleSubmit(e);
+      expect(newBill.createBill).not.toBeCalled();
       expect(window.alert).toBeCalled();
       expect(document.activeElement).toEqual(document.querySelector(`input[data-testid="file"]`));
     });
   });
   describe("When I am on NewBill Page and I fill the form whithout pct and submit", () => {
     test("Then the form should be sent with 20 as default value for pct field", () => {
-      const newBill = new InitiateNewBill();
-      new FillTheForm({ pct: "" });
+      document.body.innerHTML = NewBillUI();
+      const newBill = new NewBill({
+        document,
+        mockOnNavigate,
+        firestore: firestore,
+        localStorage: window.localStorage,
+      });
+      fillTheNewBillForm({ pct: "" });
       let sentPctValue;
-      newBill.object.createBill = jest.fn(function (bill) {
+      newBill.createBill = jest.fn(function (bill) {
         sentPctValue = bill.pct;
       });
       let e = new Event("submit"); // in order to "e.target" statements of handleSubmit to work
       Object.defineProperty(e, "target", { value: document.querySelector("form") });
-      newBill.object.handleSubmit(e);
-      expect(newBill.object.createBill).toBeCalled();
+      newBill.handleSubmit(e);
+      expect(newBill.createBill).toBeCalled();
       expect(sentPctValue).toEqual(20);
     });
   });
@@ -294,7 +322,8 @@ describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page and I choose a file", () => {
     test("Then the file is posted to the firebase", async () => {
       const putSpy = jest.spyOn(firestore.storage, "put");
-      new InitiateRouterToNewBill();
+      document.body.innerHTML = `<div id='root'></div>`;
+      router();
       const file = new File(["sample"], "sample.png", { type: "image/png" });
       Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.png" });
       fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
@@ -310,7 +339,8 @@ describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page and I choose a file but here is a server error", () => {
     test("Then the file is not posted", async () => {
       jest.spyOn(firestore.storage, "put").mockRejectedValueOnce(Error("Any error"));
-      new InitiateRouterToNewBill();
+      document.body.innerHTML = `<div id='root'></div>`;
+      router();
       const file = new File(["sample"], "sample.png", { type: "image/png" });
       Object.defineProperty(document.querySelector(`input[data-testid="file"]`), "value", { value: "fakepath/sample.png" });
       fireEvent.change(document.querySelector(`input[data-testid="file"]`), {
@@ -327,8 +357,9 @@ describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page and I correctly fill the form and submit", () => {
     test("Then the filled data should be sent to firebase and the app navigate to Bills page", async () => {
       const postSpy = jest.spyOn(mockFirebase, "add");
-      new InitiateRouterToNewBill();
-      new FillTheForm();
+      document.body.innerHTML = `<div id='root'></div>`;
+      router();
+      fillTheNewBillForm();
       await flushPromises(); // handleChangeFile promises
       let sentData = {
         email: JSON.parse(window.localStorage.getItem("user")).email,
@@ -353,8 +384,9 @@ describe("Given I am connected as an employee", () => {
     test("Then the filled data should be sent to firebase but the form is not accepted and it stays on NewBill Page", async () => {
       jest.spyOn(mockFirebase, "add").mockRejectedValueOnce(Error("Any error"));
       window.alert = jest.fn();
-      new InitiateRouterToNewBill();
-      new FillTheForm();
+      document.body.innerHTML = `<div id='root'></div>`;
+      router();
+      fillTheNewBillForm();
       await flushPromises(); // handleChangeFile promises
       userEvent.click(document.getElementById("btn-send-bill"));
       await flushPromises(); //handleSubmit promises

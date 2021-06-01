@@ -1,72 +1,40 @@
 import { screen } from "@testing-library/dom";
 import Bills from "../containers/Bills.js";
 import BillsUI from "../views/BillsUI.js";
-import { bills } from "../fixtures/bills.js";
+import { billsSample } from "../fixtures/billsSample.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import mockFirebase from "../__mocks__/firebase";
 import router from "../app/Router.js";
-import firestore from "../app/Firestore.js";
-jest.mock("../app/Firestore.js", () => {
-  return {
-    bills: function () {
-      return mockFirebase;
-    },
-  };
-});
+import mockOnNavigate from "../__mocks__/onNavigate.js";
+jest.mock("../app/Firestore.js");
 
 //setup for tests
+
+Object.defineProperty(window, "location", {
+  value: {
+    pathname: "/",
+    hash: "#employee/bills",
+  },
+});
+
+Object.defineProperty(window, "localStorage", { value: localStorageMock });
+window.localStorage.setItem(
+  "user",
+  JSON.stringify({
+    type: "Employee",
+    email: "a@a",
+  })
+);
+
 const flushPromises = async () => new Promise(setImmediate); // wait for any pending promise to be resolved before continue the code
 
-class InitiateBills {
-  constructor({ billsSample = bills, error = false, loading = false } = {}) {
-    const onNavigate = () => {
-      return;
-    };
-    Object.defineProperty(window, "localStorage", { value: localStorageMock });
-    window.localStorage.setItem(
-      "user",
-      JSON.stringify({
-        type: "Employee",
-        email: "a@a",
-      })
-    );
-    document.body.innerHTML = BillsUI({ data: billsSample, error: error, loading: loading });
-    this.object = new Bills({
-      document,
-      onNavigate,
-      firestore: null,
-      localStorage: window.localStorage,
-    });
-  }
-}
-
-class InitiateRouterToBills {
-  constructor() {
-    document.body.innerHTML = `<div id='root'></div>`;
-    Object.defineProperty(window, "location", {
-      value: {
-        pathname: "/",
-        hash: "#employee/bills",
-      },
-    });
-    Object.defineProperty(window, "localStorage", { value: localStorageMock });
-    window.localStorage.setItem(
-      "user",
-      JSON.stringify({
-        type: "Employee",
-        email: "a@a",
-      })
-    );
-    router();
-  }
-}
 //end of setup
 
 describe("Given I am connected as an employee", () => {
   // Unit tests
   describe("When I access Bills Page", () => {
     test("Then the Bills page should be rendered", () => {
-      document.body.innerHTML = BillsUI({ data: bills });
+      document.body.innerHTML = BillsUI({ data: billsSample });
       expect(screen.getAllByText("Mes notes de frais")).toBeTruthy();
     });
   });
@@ -85,7 +53,7 @@ describe("Given I am connected as an employee", () => {
       };
       const antiChronoSort = (a, b) => (formatDateReverse(a) < formatDateReverse(b) ? 1 : -1);
 
-      document.body.innerHTML = BillsUI({ data: bills });
+      document.body.innerHTML = BillsUI({ data: billsSample });
       const dates = Array.from(document.body.querySelectorAll("#data-table tbody>tr>td:nth-child(3)")).map((a) => a.innerHTML);
       const datesSorted = [...dates].sort(antiChronoSort);
       expect(dates).toEqual(datesSorted);
@@ -112,34 +80,58 @@ describe("Given I am connected as an employee", () => {
   });
   describe("When I am on Bills page and I click on the submit a new bill button", () => {
     test("Then, the submit a new bill handler should be run", () => {
-      const initiateBills = new InitiateBills();
-      initiateBills.object.handleClickNewBill = jest.fn();
+      document.body.innerHTML = BillsUI({ data: billsSample });
+      const bills = new Bills({
+        document,
+        mockOnNavigate,
+        firestore: null,
+        localStorage: window.localStorage,
+      });
+      bills.handleClickNewBill = jest.fn();
       document.querySelector(`button[data-testid="btn-new-bill"]`).click();
-      expect(initiateBills.object.handleClickNewBill).toBeCalled();
+      expect(bills.handleClickNewBill).toBeCalled();
     });
   });
   describe("When I am on Bills page and I click on the iconEye of one of the bills", () => {
     test("Then, the open modal handler should be run", () => {
-      const initiateBills = new InitiateBills();
-      initiateBills.object.handleClickIconEye = jest.fn();
+      document.body.innerHTML = BillsUI({ data: billsSample });
+      const bills = new Bills({
+        document,
+        mockOnNavigate,
+        firestore: null,
+        localStorage: window.localStorage,
+      });
+      bills.handleClickIconEye = jest.fn();
       document.querySelector(`div[data-testid="icon-eye"]`).click();
-      expect(initiateBills.object.handleClickIconEye).toBeCalled();
+      expect(bills.handleClickIconEye).toBeCalled();
     });
   });
   describe("When I am on Bills page and I click on the submit a new bill button", () => {
     test("Then, the router should be called to go to the newBill page", () => {
-      const initiateBills = new InitiateBills();
-      initiateBills.object.onNavigate = jest.fn();
-      initiateBills.object.handleClickNewBill();
-      expect(initiateBills.object.onNavigate).toHaveBeenCalledWith("#employee/bill/new");
+      document.body.innerHTML = BillsUI({ data: billsSample, error: false, loading: false });
+      const bills = new Bills({
+        document,
+        mockOnNavigate,
+        firestore: null,
+        localStorage: window.localStorage,
+      });
+      bills.onNavigate = jest.fn();
+      bills.handleClickNewBill();
+      expect(bills.onNavigate).toHaveBeenCalledWith("#employee/bill/new");
     });
   });
   describe("When I am on Bills page and I open the modal", () => {
     test("Then, the modal should open with the image of the bill attached file inside", () => {
-      const initiateBills = new InitiateBills();
+      document.body.innerHTML = BillsUI({ data: billsSample, error: false, loading: false });
+      const bills = new Bills({
+        document,
+        mockOnNavigate,
+        firestore: null,
+        localStorage: window.localStorage,
+      });
       $.fn.modal = jest.fn(); //modal is a Bootstrap function, not reachable here
       const iconEye = document.querySelector(`div[data-testid="icon-eye"]`);
-      initiateBills.object.handleClickIconEye(iconEye);
+      bills.handleClickIconEye(iconEye);
       expect($.fn.modal).toHaveBeenCalled();
       expect(document.querySelector(".modal-body img").getAttribute("src")).toEqual(iconEye.getAttribute("data-bill-url"));
     });
@@ -151,7 +143,8 @@ describe("Given I am a user connected as Employee", () => {
   describe("When I land on Bills Page", () => {
     test("fetches bills from mock API GET", async () => {
       const getSpy = jest.spyOn(mockFirebase, "get");
-      new InitiateRouterToBills();
+      document.body.innerHTML = `<div id='root'></div>`;
+      router();
       await flushPromises(); // router() : getBills().then() promise
       expect(getSpy).toHaveBeenCalled();
       const numberOfLines = document.querySelectorAll("tbody[data-testid='tbody'] tr").length;
@@ -159,13 +152,15 @@ describe("Given I am a user connected as Employee", () => {
     });
     test("fetches bills from an API and fails with 404 message error", async () => {
       jest.spyOn(mockFirebase, "get").mockRejectedValueOnce(Error("Erreur 404"));
-      new InitiateRouterToBills();
+      document.body.innerHTML = `<div id='root'></div>`;
+      router();
       await flushPromises(); // router() : getBills().then() promise
       expect(screen.getByText(/Erreur 404/)).toBeTruthy();
     });
     test("fetches bills from an API and fails with 500 message error", async () => {
       jest.spyOn(mockFirebase, "get").mockRejectedValueOnce(Error("Erreur 500"));
-      new InitiateRouterToBills();
+      document.body.innerHTML = `<div id='root'></div>`;
+      router();
       await flushPromises(); // router() : getBills().then() promise
       expect(screen.getByText(/Erreur 500/)).toBeTruthy();
     });
