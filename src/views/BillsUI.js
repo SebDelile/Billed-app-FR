@@ -1,31 +1,62 @@
-import VerticalLayout from './VerticalLayout.js'
-import ErrorPage from "./ErrorPage.js"
-import LoadingPage from "./LoadingPage.js"
+/** @module views/BillsUI */
+import VerticalLayout from "./VerticalLayout.js";
+import ErrorPage from "./ErrorPage.js";
+import LoadingPage from "./LoadingPage.js";
+import { formatDate, formatStatus } from "../app/format.js";
+import Actions from "./Actions.js";
 
-import Actions from './Actions.js'
-
+/**
+ * function row - build the UI of a row of the Bills table
+ * @function row
+ * @param {Object} bill - a bill object
+ * @return {string} the UI of the table row to be used in the bill's table
+ */
 const row = (bill) => {
-  return (`
+  return `
     <tr>
       <td>${bill.type}</td>
       <td>${bill.name}</td>
-      <td>${bill.date}</td>
+      <td>${formatDate(bill.date)}</td>
       <td>${bill.amount} €</td>
-      <td>${bill.status}</td>
+      <td>${formatStatus(bill.status)}</td>
       <td>
         ${Actions(bill.fileUrl)}
       </td>
     </tr>
-    `)
-  }
+    `;
+};
 
+/**
+ * function rows - build the UI of a row of the Bills table
+ * @function rows
+ * @param {Array} data - the list of the bills
+ * @return {string} the UI of the bill's table to be used in the html
+ */
 const rows = (data) => {
-  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
-}
+  if (data && data.length) {
+    data.sort((a, b) => new Date(b.date) - new Date(a.date));
+    return data.map((bill) => row(bill)).join("");
+  } else {
+    return;
+  }
+};
 
+/**
+ * function BillsUI - build UI of the Bills page
+ * @function
+ * @param {Array} data - the list of the bills
+ * @param {boolean} loading - is loading page or not
+ * @param {string} error - the error message if applicable
+ * @return {string} the UI of the bill's page to be used in the html
+ */
 export default ({ data: bills, loading, error }) => {
-  
-  const modal = () => (`
+  /**
+   * function modal - build UI of the modal to display the bill's attached file
+   * @function modal
+   * @memberof BillsUI
+   * @return {string} the UI of the modal to be used in the html
+   */
+  const modal = () => `
     <div class="modal fade" id="modaleFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -40,15 +71,15 @@ export default ({ data: bills, loading, error }) => {
         </div>
       </div>
     </div>
-  `)
+  `;
 
   if (loading) {
-    return LoadingPage()
+    return LoadingPage();
   } else if (error) {
-    return ErrorPage(error)
+    return ErrorPage(error);
   }
-  
-  return (`
+
+  return `
     <div class='layout'>
       ${VerticalLayout(120)}
       <div class='content'>
@@ -75,6 +106,5 @@ export default ({ data: bills, loading, error }) => {
         </div>
       </div>
       ${modal()}
-    </div>`
-  )
-}
+    </div>`;
+};

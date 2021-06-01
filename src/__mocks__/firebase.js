@@ -1,7 +1,7 @@
 export default {
   get: () => {
     return Promise.resolve({
-      data: [{
+      docs: [{data: () => ({
         "id": "47qAXb6fIm2zOKkLzMro",
         "vat": "80",
         "fileUrl": "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
@@ -15,8 +15,8 @@ export default {
         "commentAdmin": "ok",
         "email": "a@a",
         "pct": 20
-      },
-      {
+      })},
+      {data: () => ({
         "id": "BeKy5Mo4jkmdfPGYpTxZ",
         "vat": "",
         "amount": 100,
@@ -30,8 +30,8 @@ export default {
         "date": "2001-01-01",
         "status": "refused",
         "commentAdmin": "en fait non"
-      },
-      {
+      })},
+      {data: () => ({
         "id": "UIUZtnPQvnbFnB0ozvJh",
         "name": "test3",
         "email": "a@a",
@@ -45,8 +45,8 @@ export default {
         "commentary": "",
         "fileName": "facture-client-php-exportee-dans-document-pdf-enregistre-sur-disque-dur.png",
         "fileUrl": "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…dur.png?alt=media&token=571d34cb-9c8f-430a-af52-66221cae1da3"
-      },
-      {
+      })},
+      {data: () => ({
         "id": "qcCK3SzECmaZAGRrHjaC",
         "status": "refused",
         "pct": 20,
@@ -60,7 +60,10 @@ export default {
         "commentary": "test2",
         "type": "Restaurants et bars",
         "fileUrl": "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=4df6ed2c-12c8-42a2-b013-346c1346f732"
-      }]
+      })}]
     })
+  },
+  add: () => {
+    return Promise.resolve(null)
   }
 }

@@ -1,8 +1,13 @@
-import VerticalLayout from './VerticalLayout.js'
+/** @module views/NewBillUI */
+import VerticalLayout from "./VerticalLayout.js";
 
+/**
+ * function NewBillUI - build UI of the NewBill page
+ * @function
+ * @return {string} the UI of the NewBill page to be used in the html
+ */
 export default () => {
-
-  return (`
+  return `
     <div class='layout'>
       ${VerticalLayout(120)}
       <div class='content'>
@@ -16,6 +21,7 @@ export default () => {
                   <div class="col-half">
                     <label for="expense-type" class="bold-label">Type de dépense</label>
                       <select required class="form-control blue-border" data-testid="expense-type">
+                        <option value="">-- Choisissez une option --</option>  
                         <option>Transports</option>
                         <option>Restaurants et bars</option>
                         <option>Hôtel et logement</option>
@@ -40,11 +46,11 @@ export default () => {
                   <div class="col-half-row">
                     <div class="flex-col"> 
                       <label for="vat" class="bold-label">TVA</label>
-                      <input type="number" class="form-control blue-border" data-testid="vat" placeholder="70" />
+                      <input required type="number" class="form-control blue-border" data-testid="vat" placeholder="70" />
                     </div>
                     <div class="flex-col">
                       <label for="pct" class="white-text">%</label>
-                      <input required type="number" class="form-control blue-border" data-testid="pct" placeholder="20" />
+                      <input type="number" class="form-control blue-border" data-testid="pct" placeholder="20" />
                     </div>
                   </div>
                 </div>
@@ -55,7 +61,7 @@ export default () => {
                   </div>
                   <div class="col-half">
                     <label for="file" class="bold-label">Justificatif</label>
-                    <input required type="file" class="form-control blue-border" data-testid="file" />
+                    <input required type="file" class="form-control blue-border" data-testid="file" accept="image/png, image/jpeg"/>
                   </div>
                 </div>
             </div>
@@ -70,5 +76,5 @@ export default () => {
         </div>
       </div>
     </div>
-  `)
-}
+  `;
+};

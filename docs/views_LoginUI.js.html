@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: views/LoginUI.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: views/LoginUI.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module views/LoginUI */
+/**
+ * function LoginUI - build UI of the Login page
+ * @function
+ * @return {string} the UI of the Login page to be used in the html
+ */
+export default () => {
+  return(`
+      &lt;div class="page-div">
+        &lt;div class="row">
+          &lt;div class="title-container"> 
+            &lt;svg width="3em" height="3em" viewBox="0 0 16 16" class="bi bi-receipt" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              &lt;path fill-rule="evenodd" d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27zm.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0l-.509-.51z"/>
+              &lt;path fill-rule="evenodd" d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5z"/>
+            &lt;/svg>
+            &lt;h1> Billed &lt;/h1>
+          &lt;/div>
+        &lt;/div>
+        &lt;div class="row">
+          &lt;div class="col-sm-6">
+            &lt;div class="card">
+              &lt;div class="card-body">
+                &lt;form class="form-signin" data-testid="form-employee">
+                  &lt;h2 class="h3 mb-3 font-weight-normal">Employé&lt;/h1>
+                  &lt;label for="inputEmail">Votre email&lt;/label>
+                  &lt;input type="email" data-testid="employee-email-input" class="form-control" placeholder="johndoe@email.com" required autofocus>
+                  &lt;label for="inputPassword">Mot de passe&lt;/label>
+                  &lt;input type="password" data-testid="employee-password-input" class="form-control" placeholder="******" required>
+                  &lt;button class="btn btn-lg btn-primary btn-block" data-testid="employee-login-button" style="background-color: #0E5AE5;" type="submit">Se connecter&lt;/button>
+                &lt;/form>
+              &lt;/div>
+            &lt;/div>
+          &lt;/div>
+          &lt;div class="col-sm-6">
+            &lt;div class="card">
+              &lt;div class="card-body">
+                &lt;form class="form-signin" data-testid="form-admin">
+                  &lt;h2 class="h3 mb-3 font-weight-normal">Administration&lt;/h1>
+                  &lt;label for="inputEmail">Votre email&lt;/label>
+                  &lt;input type="email" data-testid="admin-email-input" class="form-control" placeholder="johndoe@email.com" required autofocus>
+                  &lt;label for="inputPassword">Mot de passe&lt;/label>
+                  &lt;input type="password" data-testid="admin-password-input" class="form-control" placeholder="******" required>
+                  &lt;button  type="submit" class="btn btn-lg btn-primary btn-block" data-testid="admin-login-button" style="background-color: #0E5AE5;">Se connecter&lt;/button>
+                &lt;/form>
+              &lt;/div>
+            &lt;/div>
+          &lt;/div>
+        &lt;/div>
+      &lt;/div>
+  `)
+}
+  </code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-app_format.html">app/format</a></li><li><a href="module-app_Router.html">app/Router</a></li><li><a href="module-constants_routes.html">constants/routes</a></li><li><a href="module-constants_usersTest.html">constants/usersTest</a></li><li><a href="module-fixtures_billsSample.html">fixtures/billsSample</a></li><li><a href="module-views_Actions.html">views/Actions</a></li><li><a href="module-views_BillsUI.html">views/BillsUI</a></li><li><a href="module-views_DashboardFormUI.html">views/DashboardFormUI</a></li><li><a href="module-views_DashboardUI.html">views/DashboardUI</a></li><li><a href="module-views_ErrorPage.html">views/ErrorPage</a></li><li><a href="module-views_LoadingPage.html">views/LoadingPage</a></li><li><a href="module-views_LoginUI.html">views/LoginUI</a></li><li><a href="module-views_NewBillUI.html">views/NewBillUI</a></li><li><a href="module-views_VerticalLayout.html">views/VerticalLayout</a></li></ul><h3>Classes</h3><ul><li><a href="Bills.html">Bills</a></li><li><a href="Dashboard.html">Dashboard</a></li><li><a href="Firestore.html">Firestore</a></li><li><a href="Login.html">Login</a></li><li><a href="Logout.html">Logout</a></li><li><a href="NewBill.html">NewBill</a></li></ul><h3>Global</h3><ul><li><a href="global.html#card">card</a></li><li><a href="global.html#cards">cards</a></li><li><a href="global.html#filteredBills">filteredBills</a></li><li><a href="global.html#getStatus">getStatus</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue Jun 01 2021 23:27:28 GMT+0200 (heure d’été d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

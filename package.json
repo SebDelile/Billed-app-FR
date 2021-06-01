@@ -1,6 +1,8 @@
 {
   "scripts": {
-    "test": "jest --coverage --noStackTrace --silent"
+    "test": "jest --coverage --noStackTrace --silent",
+    "jest-debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
+    "doc": "jsdoc -c jsdoc.json"
   },
   "jest": {
     "verbose": false,
@@ -9,6 +11,7 @@
     ],
     "collectCoverageFrom": [
       "**/*.{js,jsx}",
+      "!**/docs/**",
       "!**/app/**",
       "!**/assets/**",
       "!**/external/**",
@@ -18,9 +21,7 @@
   },
   "type": "module",
   "dependencies": {
-    "express": "^4.17.1",
-    "jquery": "^3.5.1",
-    "path": "^0.12.7"
+    "jquery": "^3.5.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.10.4",

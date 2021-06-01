@@ -6,25 +6,25 @@ import Dashboard, { filteredBills, cards } from "../containers/Dashboard.js"
 import { ROUTES } from "../constants/routes"
 import { localStorageMock } from "../__mocks__/localStorage.js"
 import firebase from "../__mocks__/firebase"
-import { bills } from "../fixtures/bills"
+import { billsSample } from "../fixtures/billsSample"
 
 
 describe('Given I am connected as an Admin', () => {
   describe('When I am on Dashboard page, there are bills, and there is one pending', () => {
     test('Then, filteredBills by pending status should return 1 bill', () => {
-      const filtered_bills = filteredBills(bills, "pending")
+      const filtered_bills = filteredBills(billsSample, "pending")
       expect(filtered_bills.length).toBe(1)
     })
   })
   describe('When I am on Dashboard page, there are bills, and there is one accepted', () => {
     test('Then, filteredBills by accepted status should return 1 bill', () => {
-      const filtered_bills = filteredBills(bills, "accepted")
+      const filtered_bills = filteredBills(billsSample, "accepted")
       expect(filtered_bills.length).toBe(1)
     })
   })
   describe('When I am on Dashboard page, there are bills, and there is two refused', () => {
     test('Then, filteredBills by accepted status should return 2 bills', () => {
-      const filtered_bills = filteredBills(bills, "refused")
+      const filtered_bills = filteredBills(billsSample, "refused")
       expect(filtered_bills.length).toBe(2)
     })
   })
@@ -56,15 +56,15 @@ describe('Given I am connected as an Admin', () => {
       }))
 
       const dashboard = new Dashboard({
-        document, onNavigate, firestore: null, bills, localStorage: window.localStorage
+        document, onNavigate, firestore: null, billsSample, localStorage: window.localStorage
       })          
-      const html = DashboardUI({ data: bills })
+      const html = DashboardUI({ data: billsSample })
    
       document.body.innerHTML = html
 
-      const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 1)) 
-      const handleShowTickets2 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 2))    
-      const handleShowTickets3 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 3))    
+      const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, billsSample, 1)) 
+      const handleShowTickets2 = jest.fn((e) => dashboard.handleShowTickets(e, billsSample, 2))    
+      const handleShowTickets3 = jest.fn((e) => dashboard.handleShowTickets(e, billsSample, 3))    
 
       const icon1 = screen.getByTestId('arrow-icon1')
       const icon2 = screen.getByTestId('arrow-icon2')
@@ -88,7 +88,7 @@ describe('Given I am connected as an Admin', () => {
 
   describe('When I am on Dashboard page and I click on edit icon of a card', () => {
     test('Then, right form should be filled', () => {
-      const html = cards(bills)
+      const html = cards(billsSample)
       document.body.innerHTML = html
 
       const onNavigate = (pathname) => {
@@ -98,10 +98,10 @@ describe('Given I am connected as an Admin', () => {
 
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       const dashboard = new Dashboard({
-        document, onNavigate, firestore, bills, localStorage: window.localStorage
+        document, onNavigate, firestore, billsSample, localStorage: window.localStorage
       })
 
-      const handleEditTicket = jest.fn((e) => dashboard.handleEditTicket(e, bills[0], bills))   
+      const handleEditTicket = jest.fn((e) => dashboard.handleEditTicket(e, billsSample[0], billsSample))   
       const iconEdit = screen.getByTestId('open-bill47qAXb6fIm2zOKkLzMro')
       iconEdit.addEventListener('click', handleEditTicket)
       userEvent.click(iconEdit)
@@ -129,18 +129,18 @@ describe('Given I am connected as Admin, and I am on Dashboard page, and I click
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Admin'
       }))
-      const html = DashboardFormUI(bills[0])
+      const html = DashboardFormUI(billsSample[0])
       document.body.innerHTML = html
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
       const firestore = null
       const dashboard = new Dashboard({
-        document, onNavigate, firestore, bills, localStorage: window.localStorage
+        document, onNavigate, firestore, billsSample, localStorage: window.localStorage
       })
 
       const acceptButton = screen.getByTestId("btn-accept-bill-d")
-      const handleAcceptSubmit = jest.fn((e) => dashboard.handleAcceptSubmit(e, bills[0]))
+      const handleAcceptSubmit = jest.fn((e) => dashboard.handleAcceptSubmit(e, billsSample[0]))
       acceptButton.addEventListener("click", handleAcceptSubmit)
       fireEvent.click(acceptButton)
       expect(handleAcceptSubmit).toHaveBeenCalled()
@@ -154,17 +154,17 @@ describe('Given I am connected as Admin, and I am on Dashboard page, and I click
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Admin'
       }))
-      const html = DashboardFormUI(bills[0])
+      const html = DashboardFormUI(billsSample[0])
       document.body.innerHTML = html
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
       const firestore = null
       const dashboard = new Dashboard({
-        document, onNavigate, firestore, bills, localStorage: window.localStorage
+        document, onNavigate, firestore, billsSample, localStorage: window.localStorage
       })
       const refuseButton = screen.getByTestId("btn-refuse-bill-d")
-      const handleRefuseSubmit = jest.fn((e) => dashboard.handleRefuseSubmit(e, bills[0]))
+      const handleRefuseSubmit = jest.fn((e) => dashboard.handleRefuseSubmit(e, billsSample[0]))
       refuseButton.addEventListener("click", handleRefuseSubmit)
       fireEvent.click(refuseButton)
       expect(handleRefuseSubmit).toHaveBeenCalled()
@@ -181,14 +181,14 @@ describe('Given I am connected as Admin and I am on Dashboard page and I clicked
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Admin'
       }))
-      const html = DashboardFormUI(bills[0])
+      const html = DashboardFormUI(billsSample[0])
       document.body.innerHTML = html
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
       const firestore = null
       const dashboard = new Dashboard({
-        document, onNavigate, firestore, bills, localStorage: window.localStorage
+        document, onNavigate, firestore, billsSample, localStorage: window.localStorage
       })
 
       const handleClickIconEye = jest.fn(dashboard.handleClickIconEye)
@@ -208,9 +208,9 @@ describe("Given I am a user connected as Admin", () => {
   describe("When I navigate to Dashboard", () => {
     test("fetches bills from mock API GET", async () => {
        const getSpy = jest.spyOn(firebase, "get")
-       const bills = await firebase.get()
+       const billsSample = await firebase.get()
        expect(getSpy).toHaveBeenCalledTimes(1)
-       expect(bills.data.length).toBe(4)
+       expect(billsSample.docs.length).toBe(4)
     })
     test("fetches bills from an API and fails with 404 message error", async () => {
       firebase.get.mockImplementationOnce(() =>

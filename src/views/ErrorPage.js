@@ -1,8 +1,14 @@
-import VerticalLayout from './VerticalLayout.js'
+/** @module views/ErrorPage */
+import VerticalLayout from "./VerticalLayout.js";
 
+/**
+ * function ErrorPage - build UI of the Error page
+ * @function
+ * @param {string} error - the error message if applicable
+ * @return {string} the UI of the error page to be used in the html
+ */
 export default (error) => {
-
-  return (`
+  return `
     <div class='layout'>
       ${VerticalLayout()}
       <div class='content'>
@@ -12,6 +18,5 @@ export default (error) => {
         <div data-testid="error-message">
           ${error ? error : ""}
         </div>
-    </div>`
-  )
-}
+    </div>`;
+};
